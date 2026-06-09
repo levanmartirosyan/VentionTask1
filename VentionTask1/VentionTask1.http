@@ -1,0 +1,6 @@
+@VentionTask1_HostAddress = http://localhost:5027
+
+GET {{VentionTask1_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
