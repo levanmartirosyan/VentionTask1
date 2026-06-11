@@ -13,7 +13,7 @@ namespace VentionTask1.Services.Implementation
               new Product { Id = 3, Name = "Product 3", Price = 30.99m }
             ];
 
-        public async Task<List<ProductDTO>> GetAllProducts()
+        public List<ProductDTO> GetAllProducts()
         {
             return Products.Select(p => new ProductDTO
             {
@@ -23,9 +23,10 @@ namespace VentionTask1.Services.Implementation
             }).ToList();
         }
 
-        public async Task<ProductDTO?> GetProductById(int id)
+        public ProductDTO? GetProductById(int id)
         {
-            var product = Products.FirstOrDefault(p => p.Id == id);
+            var product =  Products.FirstOrDefault(p => p.Id == id);
+
             if (product == null) return null;
 
             return new ProductDTO
@@ -36,7 +37,7 @@ namespace VentionTask1.Services.Implementation
             };
         }
 
-        public async Task<ProductDTO> CreateProduct(CreateProductDTO createProductDTO)
+        public ProductDTO CreateProduct(CreateProductDTO createProductDTO)
         {
             var newProduct = new Product
             {
@@ -55,7 +56,7 @@ namespace VentionTask1.Services.Implementation
             };
         }
 
-        public async Task<ProductDTO> UpdateProduct(int id, UpdateProductDTO updateProductDTO)
+        public ProductDTO UpdateProduct(int id, UpdateProductDTO updateProductDTO)
         {
             var product = Products.FirstOrDefault(p => p.Id == id);
 
@@ -79,7 +80,7 @@ namespace VentionTask1.Services.Implementation
             };
         }
 
-        public async Task<bool> DeleteProduct(int id)
+        public bool DeleteProduct(int id)
         {
             var product = Products.FirstOrDefault(p => p.Id == id);
 
