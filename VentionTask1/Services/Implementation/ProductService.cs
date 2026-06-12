@@ -1,21 +1,24 @@
-﻿using VentionTask1.DTOs;
+using VentionTask1.DTOs;
 using VentionTask1.Entities;
+using VentionTask1.Repositories.Interfaces;
 using VentionTask1.Services.Interfaces;
 
 namespace VentionTask1.Services.Implementation
 {
     public class ProductService : IProductService
     {
-        private static readonly List<Product> Products =
-            [ 
-              new Product { Id = 1, Name = "Product 1", Price = 10.99m },
-              new Product { Id = 2, Name = "Product 2", Price = 20.99m },
-              new Product { Id = 3, Name = "Product 3", Price = 30.99m }
-            ];
+        private readonly IProductRepository _productRepository;
 
-        public List<ProductDTO> GetAllProducts()
+        public ProductService(IProductRepository productRepository)
         {
-            return Products.Select(p => new ProductDTO
+            _productRepository = productRepository;
+        }
+
+        public async Task<List<ProductDTO>> GetAllProducts()
+        {
+            var products = await _productRepository.GetAllProducts();
+
+            return products.Select(p => new ProductDTO
             {
                 Id = p.Id,
                 Name = p.Name,
@@ -23,9 +26,9 @@ namespace VentionTask1.Services.Implementation
             }).ToList();
         }
 
-        public ProductDTO? GetProductById(int id)
+        public async Task<ProductDTO?> GetProductById(Guid id)
         {
-            var product =  Products.FirstOrDefault(p => p.Id == id);
+            var product = await _productRepository.GetProductById(id);
 
             if (product == null) return null;
 
@@ -37,28 +40,28 @@ namespace VentionTask1.Services.Implementation
             };
         }
 
-        public ProductDTO CreateProduct(CreateProductDTO createProductDTO)
+        public async Task<ProductDTO> CreateProduct(CreateProductDTO createProductDTO)
         {
             var newProduct = new Product
             {
-                Id = Products.Count > 0 ? Products.Max(p => p.Id) + 1 : 1,
+                Id = Guid.NewGuid(),
                 Name = createProductDTO.Name,
                 Price = createProductDTO.Price
             };
 
-            Products.Add(newProduct);
+            var createdProduct = await _productRepository.CreateProduct(newProduct);
 
             return new ProductDTO
             {
-                Id = newProduct.Id,
-                Name = newProduct.Name,
-                Price = newProduct.Price
+                Id = createdProduct.Id,
+                Name = createdProduct.Name,
+                Price = createdProduct.Price
             };
         }
 
-        public ProductDTO UpdateProduct(int id, UpdateProductDTO updateProductDTO)
+        public async Task<ProductDTO> UpdateProduct(Guid id, UpdateProductDTO updateProductDTO)
         {
-            var product = Products.FirstOrDefault(p => p.Id == id);
+            var product = await _productRepository.GetProductById(id);
 
             if (product == null) throw new KeyNotFoundException("Product not found");
 
@@ -72,6 +75,8 @@ namespace VentionTask1.Services.Implementation
                 product.Price = updateProductDTO.Price.Value;
             }
 
+            await _productRepository.UpdateProduct(product);
+
             return new ProductDTO
             {
                 Id = product.Id,
@@ -80,13 +85,13 @@ namespace VentionTask1.Services.Implementation
             };
         }
 
-        public bool DeleteProduct(int id)
+        public async Task<bool> DeleteProduct(Guid id)
         {
-            var product = Products.FirstOrDefault(p => p.Id == id);
+            var product = await _productRepository.GetProductById(id);
 
             if (product == null) return false;
 
-            Products.Remove(product);
+            await _productRepository.DeleteProduct(product);
 
             return true;
         }

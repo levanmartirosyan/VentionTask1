@@ -1,3 +1,5 @@
+using VentionTask1.Repositories.Implementation;
+using VentionTask1.Repositories.Interfaces;
 using VentionTask1.Services.Implementation;
 using VentionTask1.Services.Interfaces;
 using VentionTask1.Settings;
@@ -13,6 +15,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.Configure<ApplicationSettings>(
     builder.Configuration.GetSection("ApplicationSettings"));
 
+builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IProductService, ProductService>();
 
 var app = builder.Build();
