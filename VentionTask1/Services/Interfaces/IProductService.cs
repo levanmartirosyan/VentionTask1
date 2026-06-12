@@ -4,10 +4,10 @@ namespace VentionTask1.Services.Interfaces
 {
     public interface IProductService
     {
-        Task<List<ProductDTO>> GetAllProducts();
-        Task<ProductDTO?> GetProductById(Guid id);
-        Task<ProductDTO> CreateProduct(CreateProductDTO createProductDTO);
-        Task<ProductDTO> UpdateProduct(Guid id, UpdateProductDTO updateProductDTO);
-        Task<bool> DeleteProduct(Guid id);
+        Task<List<ProductDTO>> GetAllProductsAsync();
+        Task<ProductDTO?> GetProductByIdAsync(Guid id);
+        Task<ProductDTO> CreateProductAsync(CreateProductDTO createProductDTO);
+        Task<ProductDTO> UpdateProductAsync(Guid id, UpdateProductDTO updateProductDTO);
+        Task<bool> DeleteProductAsync(Guid id);
     }
 }

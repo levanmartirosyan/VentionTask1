@@ -12,31 +12,34 @@ namespace VentionTask1.Repositories.Implementation
             new Product { Id = Guid.NewGuid(), Name = "Product 3", Price = 30.99m }
         ];
 
-        public Task<List<Product>> GetAllProducts()
+        public async Task<List<Product>> GetAllProductsAsync()
         {
-            return Task.FromResult(Products);
+            await Task.CompletedTask;
+            return Products;
         }
 
-        public Task<Product?> GetProductById(Guid id)
+        public async Task<Product?> GetProductByIdAsync(Guid id)
         {
-            return Task.FromResult(Products.FirstOrDefault(p => p.Id == id));
+            await Task.CompletedTask;
+            return Products.FirstOrDefault(p => p.Id == id);
         }
 
-        public Task<Product> CreateProduct(Product product)
+        public async Task<Product> CreateProductAsync(Product product)
         {
+            await Task.CompletedTask;
             Products.Add(product);
-            return Task.FromResult(product);
+            return product;
         }
 
-        public Task UpdateProduct(Product product)
+        public async Task UpdateProductAsync(Product product)
         {
-            return Task.CompletedTask;
+            await Task.CompletedTask;
         }
 
-        public Task DeleteProduct(Product product)
+        public async Task DeleteProductAsync(Product product)
         {
+            await Task.CompletedTask;
             Products.Remove(product);
-            return Task.CompletedTask;
         }
     }
 }

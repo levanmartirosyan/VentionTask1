@@ -14,9 +14,9 @@ namespace VentionTask1.Services.Implementation
             _productRepository = productRepository;
         }
 
-        public async Task<List<ProductDTO>> GetAllProducts()
+        public async Task<List<ProductDTO>> GetAllProductsAsync()
         {
-            var products = await _productRepository.GetAllProducts();
+            var products = await _productRepository.GetAllProductsAsync();
 
             return products.Select(p => new ProductDTO
             {
@@ -26,9 +26,9 @@ namespace VentionTask1.Services.Implementation
             }).ToList();
         }
 
-        public async Task<ProductDTO?> GetProductById(Guid id)
+        public async Task<ProductDTO?> GetProductByIdAsync(Guid id)
         {
-            var product = await _productRepository.GetProductById(id);
+            var product = await _productRepository.GetProductByIdAsync(id);
 
             if (product == null) return null;
 
@@ -40,7 +40,7 @@ namespace VentionTask1.Services.Implementation
             };
         }
 
-        public async Task<ProductDTO> CreateProduct(CreateProductDTO createProductDTO)
+        public async Task<ProductDTO> CreateProductAsync(CreateProductDTO createProductDTO)
         {
             var newProduct = new Product
             {
@@ -49,7 +49,7 @@ namespace VentionTask1.Services.Implementation
                 Price = createProductDTO.Price
             };
 
-            var createdProduct = await _productRepository.CreateProduct(newProduct);
+            var createdProduct = await _productRepository.CreateProductAsync(newProduct);
 
             return new ProductDTO
             {
@@ -59,9 +59,9 @@ namespace VentionTask1.Services.Implementation
             };
         }
 
-        public async Task<ProductDTO> UpdateProduct(Guid id, UpdateProductDTO updateProductDTO)
+        public async Task<ProductDTO> UpdateProductAsync(Guid id, UpdateProductDTO updateProductDTO)
         {
-            var product = await _productRepository.GetProductById(id);
+            var product = await _productRepository.GetProductByIdAsync(id);
 
             if (product == null) throw new KeyNotFoundException("Product not found");
 
@@ -75,7 +75,7 @@ namespace VentionTask1.Services.Implementation
                 product.Price = updateProductDTO.Price.Value;
             }
 
-            await _productRepository.UpdateProduct(product);
+            await _productRepository.UpdateProductAsync(product);
 
             return new ProductDTO
             {
@@ -85,13 +85,13 @@ namespace VentionTask1.Services.Implementation
             };
         }
 
-        public async Task<bool> DeleteProduct(Guid id)
+        public async Task<bool> DeleteProductAsync(Guid id)
         {
-            var product = await _productRepository.GetProductById(id);
+            var product = await _productRepository.GetProductByIdAsync(id);
 
             if (product == null) return false;
 
-            await _productRepository.DeleteProduct(product);
+            await _productRepository.DeleteProductAsync(product);
 
             return true;
         }
