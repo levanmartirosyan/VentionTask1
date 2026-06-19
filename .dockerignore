@@ -1,0 +1,11 @@
+**/bin/
+**/obj/
+.git/
+.github/
+.vs/
+.agents/
+.codex/
+.env
+.env.*
+Dockerfile
+README.md
