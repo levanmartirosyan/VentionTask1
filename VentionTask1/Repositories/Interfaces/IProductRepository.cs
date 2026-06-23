@@ -9,5 +9,6 @@ namespace VentionTask1.Repositories.Interfaces
         Task<Product> CreateProductAsync(Product product);
         Task UpdateProductAsync(Product product);
         Task DeleteProductAsync(Product product);
+        Task<bool> SaveChangesAsync();
     }
 }

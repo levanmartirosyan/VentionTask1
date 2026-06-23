@@ -1,3 +1,5 @@
+using Microsoft.EntityFrameworkCore;
+using VentionTask1.Data;
 using VentionTask1.Entities;
 using VentionTask1.Repositories.Interfaces;
 
@@ -5,41 +7,43 @@ namespace VentionTask1.Repositories.Implementation
 {
     public class ProductRepository : IProductRepository
     {
-        private static readonly List<Product> Products =
-        [
-            new Product { Id = Guid.NewGuid(), Name = "Product 1", Price = 10.99m },
-            new Product { Id = Guid.NewGuid(), Name = "Product 2", Price = 20.99m },
-            new Product { Id = Guid.NewGuid(), Name = "Product 3", Price = 30.99m }
-        ];
+        private readonly ApplicationDbContext _dbContext;
+
+        public ProductRepository(ApplicationDbContext dbContext)
+        {
+            _dbContext = dbContext;
+        }
 
         public async Task<List<Product>> GetAllProductsAsync()
         {
-            await Task.CompletedTask;
-            return Products;
+            return await _dbContext.Products.ToListAsync();
         }
 
         public async Task<Product?> GetProductByIdAsync(Guid id)
         {
-            await Task.CompletedTask;
-            return Products.FirstOrDefault(p => p.Id == id);
+            return await _dbContext.Products.FirstOrDefaultAsync(p => p.Id == id);
         }
 
         public async Task<Product> CreateProductAsync(Product product)
         {
-            await Task.CompletedTask;
-            Products.Add(product);
+            await _dbContext.Products.AddAsync(product);
+
             return product;
         }
 
         public async Task UpdateProductAsync(Product product)
         {
-            await Task.CompletedTask;
+            _dbContext.Products.Update(product);
         }
 
         public async Task DeleteProductAsync(Product product)
         {
-            await Task.CompletedTask;
-            Products.Remove(product);
+            _dbContext.Products.Remove(product);
+        }
+
+        public async Task<bool> SaveChangesAsync()
+        {
+            return await _dbContext.SaveChangesAsync() > 0;
         }
     }
 }

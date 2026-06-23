@@ -44,16 +44,19 @@ namespace VentionTask1.Services.Implementation
         {
             var newProduct = new Product
             {
-                Id = Guid.NewGuid(),
                 Name = createProductDTO.Name,
                 Price = createProductDTO.Price
             };
 
             var createdProduct = await _productRepository.CreateProductAsync(newProduct);
 
+            if (!await _productRepository.SaveChangesAsync())
+            {
+                throw new InvalidOperationException("Internal server error occurred while saving changes.");
+            }
+
             return new ProductDTO
             {
-                Id = createdProduct.Id,
                 Name = createdProduct.Name,
                 Price = createdProduct.Price
             };
@@ -77,6 +80,11 @@ namespace VentionTask1.Services.Implementation
 
             await _productRepository.UpdateProductAsync(product);
 
+            if (!await _productRepository.SaveChangesAsync())
+            {
+                throw new InvalidOperationException("Internal server error occurred while saving changes.");
+            }
+
             return new ProductDTO
             {
                 Id = product.Id,
@@ -92,6 +100,11 @@ namespace VentionTask1.Services.Implementation
             if (product == null) return false;
 
             await _productRepository.DeleteProductAsync(product);
+
+            if (!await _productRepository.SaveChangesAsync())
+            {
+                throw new InvalidOperationException("Internal server error occurred while saving changes.");
+            }
 
             return true;
         }
