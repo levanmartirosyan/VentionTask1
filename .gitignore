@@ -51,7 +51,10 @@ ScaffoldingReadMe.txt
 *~
 CodeCoverage/
 .agents/
+
 appsettings.Development.json
+appsettings.Local.json
+appsettings.*.local.json
 
 # MSBuild Binary and Structured Log
 *.binlog
