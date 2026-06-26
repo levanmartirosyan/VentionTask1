@@ -2,6 +2,9 @@
   <Folder Name="/Solution Items/">
     <File Path="Dockerfile" />
   </Folder>
+  <Project Path="VentionTask1.Application/VentionTask1.Application.csproj" />
+  <Project Path="VentionTask1.Domain/VentionTask1.Domain.csproj" />
+  <Project Path="VentionTask1.Infrastructure/VentionTask1.Infrastructure.csproj" />
   <Project Path="VentionTask1.Tests/VentionTask1.Tests.csproj" />
-  <Project Path="VentionTask1/VentionTask1.csproj" />
+  <Project Path="VentionTask1/VentionTask1.WebApi.csproj" />
 </Solution>

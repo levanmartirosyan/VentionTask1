@@ -1,8 +1,8 @@
 using Moq;
-using VentionTask1.DTOs;
-using VentionTask1.Entities;
-using VentionTask1.Repositories.Interfaces;
-using VentionTask1.Services.Implementation;
+using VentionTask1.Domain.Entities;
+using VentionTask1.Application.Repositories.Interfaces;
+using VentionTask1.Application.DTOs;
+using VentionTask1.Application.Services.Implementation;
 
 namespace VentionTask1.Tests
 {
@@ -103,7 +103,15 @@ namespace VentionTask1.Tests
 
             _productRepositoryMock
                 .Setup(repository => repository.CreateProductAsync(It.IsAny<Product>()))
-                .ReturnsAsync((Product product) => product);
+                .ReturnsAsync((Product product) =>
+                {
+                    product.Id = Guid.NewGuid();
+                    return product;
+                });
+
+            _productRepositoryMock
+                .Setup(repository => repository.SaveChangesAsync())
+                .ReturnsAsync(true);
 
             var result = await _productService.CreateProductAsync(createDto);
 
@@ -111,9 +119,9 @@ namespace VentionTask1.Tests
             Assert.Equal("Tablet", result.Name);
             Assert.Equal(1500, result.Price);
             _productRepositoryMock.Verify(repository => repository.CreateProductAsync(It.Is<Product>(product =>
-                product.Id != Guid.Empty &&
                 product.Name == "Tablet" &&
                 product.Price == 1500)), Times.Once);
+            _productRepositoryMock.Verify(repository => repository.SaveChangesAsync(), Times.Once);
         }
 
         [Fact]
@@ -131,9 +139,9 @@ namespace VentionTask1.Tests
 
             await Assert.ThrowsAsync<InvalidOperationException>(() => _productService.CreateProductAsync(createDto));
             _productRepositoryMock.Verify(repository => repository.CreateProductAsync(It.Is<Product>(product =>
-                product.Id != Guid.Empty &&
                 product.Name == "Phone" &&
                 product.Price == 1000)), Times.Once);
+            _productRepositoryMock.Verify(repository => repository.SaveChangesAsync(), Times.Never);
         }
 
         [Fact]
@@ -157,6 +165,10 @@ namespace VentionTask1.Tests
                 .Setup(repository => repository.GetProductByIdAsync(productId))
                 .ReturnsAsync(product);
 
+            _productRepositoryMock
+                .Setup(repository => repository.SaveChangesAsync())
+                .ReturnsAsync(true);
+
             var result = await _productService.UpdateProductAsync(productId, updateDto);
 
             Assert.Equal(productId, result.Id);
@@ -166,6 +178,7 @@ namespace VentionTask1.Tests
                 updatedProduct.Id == productId &&
                 updatedProduct.Name == "Laptop" &&
                 updatedProduct.Price == 2000)), Times.Once);
+            _productRepositoryMock.Verify(repository => repository.SaveChangesAsync(), Times.Once);
         }
 
         [Fact]
@@ -184,6 +197,7 @@ namespace VentionTask1.Tests
 
             await Assert.ThrowsAsync<KeyNotFoundException>(() => _productService.UpdateProductAsync(productId, updateDto));
             _productRepositoryMock.Verify(repository => repository.UpdateProductAsync(It.IsAny<Product>()), Times.Never);
+            _productRepositoryMock.Verify(repository => repository.SaveChangesAsync(), Times.Never);
         }
 
         [Fact]
@@ -201,10 +215,15 @@ namespace VentionTask1.Tests
                 .Setup(repository => repository.GetProductByIdAsync(productId))
                 .ReturnsAsync(product);
 
+            _productRepositoryMock
+                .Setup(repository => repository.SaveChangesAsync())
+                .ReturnsAsync(true);
+
             var result = await _productService.DeleteProductAsync(productId);
 
             Assert.True(result);
             _productRepositoryMock.Verify(repository => repository.DeleteProductAsync(product), Times.Once);
+            _productRepositoryMock.Verify(repository => repository.SaveChangesAsync(), Times.Once);
         }
 
         [Fact]
@@ -220,6 +239,7 @@ namespace VentionTask1.Tests
 
             Assert.False(result);
             _productRepositoryMock.Verify(repository => repository.DeleteProductAsync(It.IsAny<Product>()), Times.Never);
+            _productRepositoryMock.Verify(repository => repository.SaveChangesAsync(), Times.Never);
         }
     }
 }

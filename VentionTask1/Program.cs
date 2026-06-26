@@ -1,29 +1,12 @@
-using Microsoft.EntityFrameworkCore;
-using VentionTask1.Data;
-using VentionTask1.Repositories.Implementation;
-using VentionTask1.Repositories.Interfaces;
-using VentionTask1.Services.Implementation;
-using VentionTask1.Services.Interfaces;
-using VentionTask1.Settings;
+using VentionTask1.Application;
+using VentionTask1.Infrastructure;
+using VentionTask1;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
-builder.Services.AddOpenApi();
-
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-{
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
-});
-
-builder.Services.Configure<ApplicationSettings>(
-    builder.Configuration.GetSection("ApplicationSettings"));
-
-builder.Services.AddScoped<IProductRepository, ProductRepository>();
-builder.Services.AddScoped<IProductService, ProductService>();
+builder.AddWebApi();
+builder.Services.AddApplication();
+builder.Services.AddInfrastructure(builder.Configuration);
 
 var app = builder.Build();
 

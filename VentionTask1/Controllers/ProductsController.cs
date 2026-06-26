@@ -1,7 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using VentionTask1.DTOs;
-using VentionTask1.Services.Interfaces;
+using VentionTask1.Application.DTOs;
+using VentionTask1.Application.Services.Interfaces;
 
 namespace VentionTask1.Controllers
 {
@@ -46,9 +46,15 @@ namespace VentionTask1.Controllers
                 return BadRequest(ModelState);
             }
 
-            var createdProduct = await _productService.CreateProductAsync(createProductDTO);
-
-            return Ok(createdProduct);
+            try
+            {
+                var createdProduct = await _productService.CreateProductAsync(createProductDTO);
+                return Ok(createdProduct);
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
         }
 
         [HttpPut("{id}")]
@@ -68,12 +74,25 @@ namespace VentionTask1.Controllers
             {
                 return NotFound();
             }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteProductAsync(Guid id)
         {
-            var result = await _productService.DeleteProductAsync(id);
+            bool result;
+
+            try
+            {
+                result = await _productService.DeleteProductAsync(id);
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
 
             if (!result) return NotFound();
 
