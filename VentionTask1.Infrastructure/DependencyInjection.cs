@@ -24,6 +24,7 @@ namespace VentionTask1.Infrastructure
             });
 
             services.AddScoped<IProductRepository, ProductRepository>();
+            services.AddScoped<IUserRepository, UserRepository>();
 
             return services;
         }
