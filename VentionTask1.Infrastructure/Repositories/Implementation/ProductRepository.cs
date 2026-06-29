@@ -14,19 +14,22 @@ namespace VentionTask1.Infrastructure.Repositories.Implementation
             _dbContext = dbContext;
         }
 
-        public async Task<List<Product>> GetAllProductsAsync()
+        public async Task<List<Product>> GetAllProductsAsync(CancellationToken ct)
         {
-            return await _dbContext.Products.ToListAsync();
+            return await _dbContext.Products
+                .AsNoTracking()
+                .ToListAsync(ct);
         }
 
-        public async Task<Product?> GetProductByIdAsync(Guid id)
+        public async Task<Product?> GetProductByIdAsync(Guid id, CancellationToken ct)
         {
-            return await _dbContext.Products.FirstOrDefaultAsync(p => p.Id == id);
+            return await _dbContext.Products
+                .FirstOrDefaultAsync(p => p.Id == id, ct);
         }
 
-        public async Task<Product> CreateProductAsync(Product product)
+        public async Task<Product> CreateProductAsync(Product product, CancellationToken ct)
         {
-            await _dbContext.Products.AddAsync(product);
+            await _dbContext.Products.AddAsync(product, ct);
 
             return product;
         }
@@ -45,9 +48,9 @@ namespace VentionTask1.Infrastructure.Repositories.Implementation
             return Task.CompletedTask;
         }
 
-        public async Task<bool> SaveChangesAsync()
+        public async Task<bool> SaveChangesAsync(CancellationToken ct)
         {
-            return await _dbContext.SaveChangesAsync() > 0;
+            return await _dbContext.SaveChangesAsync(ct) > 0;
         }
     }
 }

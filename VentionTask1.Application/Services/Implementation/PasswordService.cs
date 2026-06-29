@@ -6,11 +6,11 @@ namespace VentionTask1.Application.Services.Implementation
 {
     public class PasswordService : IPasswordService
     {
-        private readonly PasswordHasher<User> _hasher;
+        private readonly IPasswordHasher<User> _hasher;
 
-        public PasswordService()
+        public PasswordService(IPasswordHasher<User> hasher)
         {
-            _hasher = new PasswordHasher<User>();
+            _hasher = hasher;
         }
 
         public string HashPassword(User user, string password)

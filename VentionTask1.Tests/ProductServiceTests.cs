@@ -10,6 +10,7 @@ namespace VentionTask1.Tests
     {
         private readonly Mock<IProductRepository> _productRepositoryMock;
         private readonly ProductService _productService;
+        private readonly CancellationToken _ct = CancellationToken.None;
 
         public ProductServiceTests()
         {
@@ -27,30 +28,30 @@ namespace VentionTask1.Tests
             };
 
             _productRepositoryMock
-                .Setup(repository => repository.GetAllProductsAsync())
+                .Setup(repository => repository.GetAllProductsAsync(It.IsAny<CancellationToken>()))
                 .ReturnsAsync(products);
 
-            var result = await _productService.GetAllProductsAsync();
+            var result = await _productService.GetAllProductsAsync(_ct);
 
             Assert.Equal(2, result.Count);
             Assert.Equal("Phone", result[0].Name);
             Assert.Equal(1000, result[0].Price);
             Assert.Equal("Laptop", result[1].Name);
             Assert.Equal(2000, result[1].Price);
-            _productRepositoryMock.Verify(repository => repository.GetAllProductsAsync(), Times.Once);
+            _productRepositoryMock.Verify(repository => repository.GetAllProductsAsync(_ct), Times.Once);
         }
 
         [Fact]
         public async Task GetAllProducts_WhenRepositoryIsEmpty_ShouldReturnEmptyList()
         {
             _productRepositoryMock
-                .Setup(repository => repository.GetAllProductsAsync())
+                .Setup(repository => repository.GetAllProductsAsync(It.IsAny<CancellationToken>()))
                 .ReturnsAsync([]);
 
-            var result = await _productService.GetAllProductsAsync();
+            var result = await _productService.GetAllProductsAsync(_ct);
 
             Assert.Empty(result);
-            _productRepositoryMock.Verify(repository => repository.GetAllProductsAsync(), Times.Once);
+            _productRepositoryMock.Verify(repository => repository.GetAllProductsAsync(_ct), Times.Once);
         }
 
         [Fact]
@@ -65,16 +66,16 @@ namespace VentionTask1.Tests
             };
 
             _productRepositoryMock
-                .Setup(repository => repository.GetProductByIdAsync(productId))
+                .Setup(repository => repository.GetProductByIdAsync(productId, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(product);
 
-            var result = await _productService.GetProductByIdAsync(productId);
+            var result = await _productService.GetProductByIdAsync(productId, _ct);
 
             Assert.NotNull(result);
             Assert.Equal(productId, result.Id);
             Assert.Equal("Phone", result.Name);
             Assert.Equal(1000, result.Price);
-            _productRepositoryMock.Verify(repository => repository.GetProductByIdAsync(productId), Times.Once);
+            _productRepositoryMock.Verify(repository => repository.GetProductByIdAsync(productId, _ct), Times.Once);
         }
 
         [Fact]
@@ -83,13 +84,13 @@ namespace VentionTask1.Tests
             var productId = Guid.NewGuid();
 
             _productRepositoryMock
-                .Setup(repository => repository.GetProductByIdAsync(productId))
+                .Setup(repository => repository.GetProductByIdAsync(productId, It.IsAny<CancellationToken>()))
                 .ReturnsAsync((Product?)null);
 
-            var result = await _productService.GetProductByIdAsync(productId);
+            var result = await _productService.GetProductByIdAsync(productId, _ct);
 
             Assert.Null(result);
-            _productRepositoryMock.Verify(repository => repository.GetProductByIdAsync(productId), Times.Once);
+            _productRepositoryMock.Verify(repository => repository.GetProductByIdAsync(productId, _ct), Times.Once);
         }
 
         [Fact]
@@ -102,26 +103,26 @@ namespace VentionTask1.Tests
             };
 
             _productRepositoryMock
-                .Setup(repository => repository.CreateProductAsync(It.IsAny<Product>()))
-                .ReturnsAsync((Product product) =>
+                .Setup(repository => repository.CreateProductAsync(It.IsAny<Product>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync((Product product, CancellationToken _) =>
                 {
                     product.Id = Guid.NewGuid();
                     return product;
                 });
 
             _productRepositoryMock
-                .Setup(repository => repository.SaveChangesAsync())
+                .Setup(repository => repository.SaveChangesAsync(It.IsAny<CancellationToken>()))
                 .ReturnsAsync(true);
 
-            var result = await _productService.CreateProductAsync(createDto);
+            var result = await _productService.CreateProductAsync(createDto, _ct);
 
             Assert.NotEqual(Guid.Empty, result.Id);
             Assert.Equal("Tablet", result.Name);
             Assert.Equal(1500, result.Price);
             _productRepositoryMock.Verify(repository => repository.CreateProductAsync(It.Is<Product>(product =>
                 product.Name == "Tablet" &&
-                product.Price == 1500)), Times.Once);
-            _productRepositoryMock.Verify(repository => repository.SaveChangesAsync(), Times.Once);
+                product.Price == 1500), _ct), Times.Once);
+            _productRepositoryMock.Verify(repository => repository.SaveChangesAsync(_ct), Times.Once);
         }
 
         [Fact]
@@ -134,14 +135,14 @@ namespace VentionTask1.Tests
             };
 
             _productRepositoryMock
-                .Setup(repository => repository.CreateProductAsync(It.IsAny<Product>()))
+                .Setup(repository => repository.CreateProductAsync(It.IsAny<Product>(), It.IsAny<CancellationToken>()))
                 .ThrowsAsync(new InvalidOperationException("Create failed"));
 
-            await Assert.ThrowsAsync<InvalidOperationException>(() => _productService.CreateProductAsync(createDto));
+            await Assert.ThrowsAsync<InvalidOperationException>(() => _productService.CreateProductAsync(createDto, _ct));
             _productRepositoryMock.Verify(repository => repository.CreateProductAsync(It.Is<Product>(product =>
                 product.Name == "Phone" &&
-                product.Price == 1000)), Times.Once);
-            _productRepositoryMock.Verify(repository => repository.SaveChangesAsync(), Times.Never);
+                product.Price == 1000), _ct), Times.Once);
+            _productRepositoryMock.Verify(repository => repository.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
         }
 
         [Fact]
@@ -162,14 +163,14 @@ namespace VentionTask1.Tests
             };
 
             _productRepositoryMock
-                .Setup(repository => repository.GetProductByIdAsync(productId))
+                .Setup(repository => repository.GetProductByIdAsync(productId, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(product);
 
             _productRepositoryMock
-                .Setup(repository => repository.SaveChangesAsync())
+                .Setup(repository => repository.SaveChangesAsync(It.IsAny<CancellationToken>()))
                 .ReturnsAsync(true);
 
-            var result = await _productService.UpdateProductAsync(productId, updateDto);
+            var result = await _productService.UpdateProductAsync(productId, updateDto, _ct);
 
             Assert.Equal(productId, result.Id);
             Assert.Equal("Laptop", result.Name);
@@ -178,7 +179,7 @@ namespace VentionTask1.Tests
                 updatedProduct.Id == productId &&
                 updatedProduct.Name == "Laptop" &&
                 updatedProduct.Price == 2000)), Times.Once);
-            _productRepositoryMock.Verify(repository => repository.SaveChangesAsync(), Times.Once);
+            _productRepositoryMock.Verify(repository => repository.SaveChangesAsync(_ct), Times.Once);
         }
 
         [Fact]
@@ -192,12 +193,12 @@ namespace VentionTask1.Tests
             };
 
             _productRepositoryMock
-                .Setup(repository => repository.GetProductByIdAsync(productId))
+                .Setup(repository => repository.GetProductByIdAsync(productId, It.IsAny<CancellationToken>()))
                 .ReturnsAsync((Product?)null);
 
-            await Assert.ThrowsAsync<KeyNotFoundException>(() => _productService.UpdateProductAsync(productId, updateDto));
+            await Assert.ThrowsAsync<KeyNotFoundException>(() => _productService.UpdateProductAsync(productId, updateDto, _ct));
             _productRepositoryMock.Verify(repository => repository.UpdateProductAsync(It.IsAny<Product>()), Times.Never);
-            _productRepositoryMock.Verify(repository => repository.SaveChangesAsync(), Times.Never);
+            _productRepositoryMock.Verify(repository => repository.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
         }
 
         [Fact]
@@ -212,18 +213,18 @@ namespace VentionTask1.Tests
             };
 
             _productRepositoryMock
-                .Setup(repository => repository.GetProductByIdAsync(productId))
+                .Setup(repository => repository.GetProductByIdAsync(productId, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(product);
 
             _productRepositoryMock
-                .Setup(repository => repository.SaveChangesAsync())
+                .Setup(repository => repository.SaveChangesAsync(It.IsAny<CancellationToken>()))
                 .ReturnsAsync(true);
 
-            var result = await _productService.DeleteProductAsync(productId);
+            var result = await _productService.DeleteProductAsync(productId, _ct);
 
             Assert.True(result);
             _productRepositoryMock.Verify(repository => repository.DeleteProductAsync(product), Times.Once);
-            _productRepositoryMock.Verify(repository => repository.SaveChangesAsync(), Times.Once);
+            _productRepositoryMock.Verify(repository => repository.SaveChangesAsync(_ct), Times.Once);
         }
 
         [Fact]
@@ -232,14 +233,14 @@ namespace VentionTask1.Tests
             var productId = Guid.NewGuid();
 
             _productRepositoryMock
-                .Setup(repository => repository.GetProductByIdAsync(productId))
+                .Setup(repository => repository.GetProductByIdAsync(productId, It.IsAny<CancellationToken>()))
                 .ReturnsAsync((Product?)null);
 
-            var result = await _productService.DeleteProductAsync(productId);
+            var result = await _productService.DeleteProductAsync(productId, _ct);
 
             Assert.False(result);
             _productRepositoryMock.Verify(repository => repository.DeleteProductAsync(It.IsAny<Product>()), Times.Never);
-            _productRepositoryMock.Verify(repository => repository.SaveChangesAsync(), Times.Never);
+            _productRepositoryMock.Verify(repository => repository.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
         }
     }
 }

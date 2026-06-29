@@ -14,9 +14,9 @@ namespace VentionTask1.Application.Services.Implementation
             _productRepository = productRepository;
         }
 
-        public async Task<List<ProductDTO>> GetAllProductsAsync()
+        public async Task<List<ProductDTO>> GetAllProductsAsync(CancellationToken ct)
         {
-            var products = await _productRepository.GetAllProductsAsync();
+            var products = await _productRepository.GetAllProductsAsync(ct);
 
             return products.Select(p => new ProductDTO
             {
@@ -26,9 +26,9 @@ namespace VentionTask1.Application.Services.Implementation
             }).ToList();
         }
 
-        public async Task<ProductDTO?> GetProductByIdAsync(Guid id)
+        public async Task<ProductDTO?> GetProductByIdAsync(Guid id, CancellationToken ct)
         {
-            var product = await _productRepository.GetProductByIdAsync(id);
+            var product = await _productRepository.GetProductByIdAsync(id, ct);
 
             if (product == null) return null;
 
@@ -40,7 +40,7 @@ namespace VentionTask1.Application.Services.Implementation
             };
         }
 
-        public async Task<ProductDTO> CreateProductAsync(CreateProductDTO createProductDTO)
+        public async Task<ProductDTO> CreateProductAsync(CreateProductDTO createProductDTO, CancellationToken ct)
         {
             var newProduct = new Product
             {
@@ -48,9 +48,9 @@ namespace VentionTask1.Application.Services.Implementation
                 Price = createProductDTO.Price
             };
 
-            var createdProduct = await _productRepository.CreateProductAsync(newProduct);
+            var createdProduct = await _productRepository.CreateProductAsync(newProduct, ct);
 
-            if (!await _productRepository.SaveChangesAsync())
+            if (!await _productRepository.SaveChangesAsync(ct))
             {
                 throw new InvalidOperationException("Internal server error occurred while saving changes.");
             }
@@ -63,9 +63,9 @@ namespace VentionTask1.Application.Services.Implementation
             };
         }
 
-        public async Task<ProductDTO> UpdateProductAsync(Guid id, UpdateProductDTO updateProductDTO)
+        public async Task<ProductDTO> UpdateProductAsync(Guid id, UpdateProductDTO updateProductDTO, CancellationToken ct)
         {
-            var product = await _productRepository.GetProductByIdAsync(id);
+            var product = await _productRepository.GetProductByIdAsync(id, ct);
 
             if (product == null) throw new KeyNotFoundException("Product not found");
 
@@ -81,7 +81,7 @@ namespace VentionTask1.Application.Services.Implementation
 
             await _productRepository.UpdateProductAsync(product);
 
-            if (!await _productRepository.SaveChangesAsync())
+            if (!await _productRepository.SaveChangesAsync(ct))
             {
                 throw new InvalidOperationException("Internal server error occurred while saving changes.");
             }
@@ -94,15 +94,15 @@ namespace VentionTask1.Application.Services.Implementation
             };
         }
 
-        public async Task<bool> DeleteProductAsync(Guid id)
+        public async Task<bool> DeleteProductAsync(Guid id, CancellationToken ct)
         {
-            var product = await _productRepository.GetProductByIdAsync(id);
+            var product = await _productRepository.GetProductByIdAsync(id, ct);
 
             if (product == null) return false;
 
             await _productRepository.DeleteProductAsync(product);
 
-            if (!await _productRepository.SaveChangesAsync())
+            if (!await _productRepository.SaveChangesAsync(ct))
             {
                 throw new InvalidOperationException("Internal server error occurred while saving changes.");
             }

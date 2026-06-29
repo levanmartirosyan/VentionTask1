@@ -17,9 +17,9 @@ namespace VentionTask1.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllProductsAsync()
+        public async Task<IActionResult> GetAllProductsAsync(CancellationToken ct)
         {
-            var products = await _productService.GetAllProductsAsync();
+            var products = await _productService.GetAllProductsAsync(ct);
 
             if (products == null || !products.Any())
             {
@@ -30,16 +30,16 @@ namespace VentionTask1.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetProductByIdAsync(Guid id)
+        public async Task<IActionResult> GetProductByIdAsync(Guid id, CancellationToken ct)
         {
-            var product = await _productService.GetProductByIdAsync(id);
+            var product = await _productService.GetProductByIdAsync(id, ct);
             if (product == null) return NotFound();
 
             return Ok(product);
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateProductAsync([FromBody] CreateProductDTO createProductDTO)
+        public async Task<IActionResult> CreateProductAsync([FromBody] CreateProductDTO createProductDTO, CancellationToken ct)
         {
             if (!ModelState.IsValid)
             {
@@ -48,7 +48,7 @@ namespace VentionTask1.Controllers
 
             try
             {
-                var createdProduct = await _productService.CreateProductAsync(createProductDTO);
+                var createdProduct = await _productService.CreateProductAsync(createProductDTO, ct);
                 return Ok(createdProduct);
             }
             catch (Exception)
@@ -58,7 +58,7 @@ namespace VentionTask1.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateProductAsync(Guid id, [FromBody] UpdateProductDTO updateProductDTO)
+        public async Task<IActionResult> UpdateProductAsync(Guid id, [FromBody] UpdateProductDTO updateProductDTO, CancellationToken ct)
         {
             if (!ModelState.IsValid)
             {
@@ -67,7 +67,7 @@ namespace VentionTask1.Controllers
 
             try
             {
-                var updatedProduct = await _productService.UpdateProductAsync(id, updateProductDTO);
+                var updatedProduct = await _productService.UpdateProductAsync(id, updateProductDTO, ct);
                 return Ok(updatedProduct);
             }
             catch (KeyNotFoundException)
@@ -81,13 +81,13 @@ namespace VentionTask1.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteProductAsync(Guid id)
+        public async Task<IActionResult> DeleteProductAsync(Guid id, CancellationToken ct)
         {
             bool result;
 
             try
             {
-                result = await _productService.DeleteProductAsync(id);
+                result = await _productService.DeleteProductAsync(id, ct);
             }
             catch (Exception)
             {

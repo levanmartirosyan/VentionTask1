@@ -14,30 +14,32 @@ namespace VentionTask1.Infrastructure.Repositories.Implementation
             _dbContext = dbContext;
         }
 
-        public async Task<List<User>> GetAllUsersAsync()
+        public async Task<List<User>> GetAllUsersAsync(CancellationToken ct)
+        {
+            return await _dbContext.Users
+                .AsNoTracking()
+                .Include(user => user.Organization)
+                .ToListAsync(ct);
+        }
+
+        public async Task<User?> GetUserByIdAsync(Guid id, CancellationToken ct)
         {
             return await _dbContext.Users
                 .Include(user => user.Organization)
-                .ToListAsync();
+                .FirstOrDefaultAsync(user => user.Id == id, ct);
         }
 
-        public async Task<User?> GetUserByIdAsync(Guid id)
+        public async Task<User?> GetUserByEmailAsync(string email, CancellationToken ct)
         {
             return await _dbContext.Users
+                .AsNoTracking()
                 .Include(user => user.Organization)
-                .FirstOrDefaultAsync(user => user.Id == id);
+                .FirstOrDefaultAsync(user => user.Email == email, ct);
         }
 
-        public async Task<User?> GetUserByEmailAsync(string email)
+        public async Task<User> CreateUserAsync(User user, CancellationToken ct)
         {
-            return await _dbContext.Users
-                .Include(user => user.Organization)
-                .FirstOrDefaultAsync(user => user.Email == email);
-        }
-
-        public async Task<User> CreateUserAsync(User user)
-        {
-            await _dbContext.Users.AddAsync(user);
+            await _dbContext.Users.AddAsync(user, ct);
 
             return user;
         }
@@ -56,9 +58,9 @@ namespace VentionTask1.Infrastructure.Repositories.Implementation
             return Task.CompletedTask;
         }
 
-        public async Task<bool> SaveChangesAsync()
+        public async Task<bool> SaveChangesAsync(CancellationToken ct)
         {
-            return (await _dbContext.SaveChangesAsync()) > 0;
+            return (await _dbContext.SaveChangesAsync(ct)) > 0;
         }
     }
 }

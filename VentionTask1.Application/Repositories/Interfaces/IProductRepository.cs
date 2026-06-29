@@ -4,11 +4,11 @@ namespace VentionTask1.Application.Repositories.Interfaces
 {
     public interface IProductRepository
     {
-        Task<List<Product>> GetAllProductsAsync();
-        Task<Product?> GetProductByIdAsync(Guid id);
-        Task<Product> CreateProductAsync(Product product);
+        Task<List<Product>> GetAllProductsAsync(CancellationToken ct);
+        Task<Product?> GetProductByIdAsync(Guid id, CancellationToken ct);
+        Task<Product> CreateProductAsync(Product product, CancellationToken ct);
         Task UpdateProductAsync(Product product);
         Task DeleteProductAsync(Product product);
-        Task<bool> SaveChangesAsync();
+        Task<bool> SaveChangesAsync(CancellationToken ct);
     }
 }

@@ -19,9 +19,9 @@ namespace VentionTask1.WebApi.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllUsersAsync()
+        public async Task<IActionResult> GetAllUsersAsync(CancellationToken ct)
         {
-            var users = await _userService.GetAllUsersAsync();
+            var users = await _userService.GetAllUsersAsync(ct);
 
             if (users == null || !users.Any())
             {
@@ -32,9 +32,9 @@ namespace VentionTask1.WebApi.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetUserByIdAsync(Guid id)
+        public async Task<IActionResult> GetUserByIdAsync(Guid id, CancellationToken ct)
         {
-            var user = await _userService.GetUserByIdAsync(id);
+            var user = await _userService.GetUserByIdAsync(id, ct);
 
             if (user == null)
             {
@@ -45,11 +45,11 @@ namespace VentionTask1.WebApi.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateUserAsync([FromBody] CreateUserDTO userDTO)
+        public async Task<IActionResult> CreateUserAsync([FromBody] CreateUserDTO userDTO, CancellationToken ct)
         {
             try
             {
-                var createdUser = await _userService.CreateUserAsync(userDTO);
+                var createdUser = await _userService.CreateUserAsync(userDTO, ct);
 
                 return Ok(createdUser);
             }
@@ -71,17 +71,28 @@ namespace VentionTask1.WebApi.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateUserAsync(Guid id, [FromBody] UpdateUserDTO userDTO)
+        public async Task<IActionResult> UpdateUserAsync(Guid id, [FromBody] UpdateUserDTO userDTO, CancellationToken ct)
         {
             try
             {
-                var updatedUser = await _userService.UpdateUserAsync(id, userDTO);
+                var updatedUser = await _userService.UpdateUserAsync(id, userDTO, ct);
 
                 return Ok(updatedUser);
             }
             catch (ValidationException ex)
             {
                 return BadRequest(ex.ToErrorDictionary());
+            }
+            catch (KeyNotFoundException)
+            {
+                return NotFound();
+            }
+            catch (InvalidOperationException ex)
+            {
+                return Conflict(new
+                {
+                    Message = ex.Message
+                });
             }
             catch (Exception)
             {
@@ -90,11 +101,11 @@ namespace VentionTask1.WebApi.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteUserAsync(Guid id)
+        public async Task<IActionResult> DeleteUserAsync(Guid id, CancellationToken ct)
         {
             try
             {
-                var result = await _userService.DeleteUserAsync(id);
+                var result = await _userService.DeleteUserAsync(id, ct);
 
                 if (!result)
                 {
