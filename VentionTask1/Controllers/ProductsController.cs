@@ -1,7 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using VentionTask1.DTOs;
-using VentionTask1.Services.Interfaces;
+using VentionTask1.Application.DTOs;
+using VentionTask1.Application.Services.Interfaces;
 
 namespace VentionTask1.Controllers
 {
@@ -17,9 +17,9 @@ namespace VentionTask1.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllProductsAsync()
+        public async Task<IActionResult> GetAllProductsAsync(CancellationToken ct)
         {
-            var products = await _productService.GetAllProductsAsync();
+            var products = await _productService.GetAllProductsAsync(ct);
 
             if (products == null || !products.Any())
             {
@@ -30,29 +30,16 @@ namespace VentionTask1.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetProductByIdAsync(Guid id)
+        public async Task<IActionResult> GetProductByIdAsync(Guid id, CancellationToken ct)
         {
-            var product = await _productService.GetProductByIdAsync(id);
+            var product = await _productService.GetProductByIdAsync(id, ct);
             if (product == null) return NotFound();
 
             return Ok(product);
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateProductAsync([FromBody] CreateProductDTO createProductDTO)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            var createdProduct = await _productService.CreateProductAsync(createProductDTO);
-
-            return Ok(createdProduct);
-        }
-
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateProductAsync(Guid id, [FromBody] UpdateProductDTO updateProductDTO)
+        public async Task<IActionResult> CreateProductAsync([FromBody] CreateProductDTO createProductDTO, CancellationToken ct)
         {
             if (!ModelState.IsValid)
             {
@@ -61,19 +48,51 @@ namespace VentionTask1.Controllers
 
             try
             {
-                var updatedProduct = await _productService.UpdateProductAsync(id, updateProductDTO);
+                var createdProduct = await _productService.CreateProductAsync(createProductDTO, ct);
+                return Ok(createdProduct);
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateProductAsync(Guid id, [FromBody] UpdateProductDTO updateProductDTO, CancellationToken ct)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            try
+            {
+                var updatedProduct = await _productService.UpdateProductAsync(id, updateProductDTO, ct);
                 return Ok(updatedProduct);
             }
             catch (KeyNotFoundException)
             {
                 return NotFound();
             }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteProductAsync(Guid id)
+        public async Task<IActionResult> DeleteProductAsync(Guid id, CancellationToken ct)
         {
-            var result = await _productService.DeleteProductAsync(id);
+            bool result;
+
+            try
+            {
+                result = await _productService.DeleteProductAsync(id, ct);
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
 
             if (!result) return NotFound();
 

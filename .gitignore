@@ -9,6 +9,8 @@
 
 .vs/
 *.user
+.vscode/
+.idea/
 
 # Build results
 [Dd]ebug/
@@ -41,11 +43,18 @@ ScaffoldingReadMe.txt
 
 # dotenv environment variables file
 .env
+.env.*
+!.env.example
 
 # Others
 ~$*
 *~
 CodeCoverage/
+.agents/
+
+appsettings.Development.json
+appsettings.Local.json
+appsettings.*.local.json
 
 # MSBuild Binary and Structured Log
 *.binlog

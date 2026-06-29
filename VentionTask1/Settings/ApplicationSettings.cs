@@ -1,4 +1,4 @@
-﻿namespace VentionTask1.Settings
+namespace VentionTask1.Settings
 {
     public class ApplicationSettings
     {
