@@ -23,6 +23,8 @@ namespace VentionTask1.Infrastructure.Data.Configurations
             builder.HasIndex(u => u.Email)
                    .IsUnique();
 
+            builder.HasIndex(u => new { u.OrganizationId, u.Email });
+
             builder.Property(u => u.PasswordHash)
                    .IsRequired()
                    .HasMaxLength(255);

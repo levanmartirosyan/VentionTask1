@@ -16,6 +16,9 @@ namespace VentionTask1.Infrastructure.Data.Configurations
                    .IsRequired()
                    .HasMaxLength(100);
 
+            builder.HasIndex(o => o.Name)
+                   .IsUnique();
+
             builder.HasData(new Organization
             {
                 Id = Guid.Parse("11111111-1111-1111-1111-111111111111"),
