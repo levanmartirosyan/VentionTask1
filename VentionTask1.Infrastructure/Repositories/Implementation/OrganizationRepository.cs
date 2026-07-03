@@ -14,24 +14,33 @@ namespace VentionTask1.Infrastructure.Repositories.Implementation
             _dbContext = dbContext;
         }
 
-        public async Task<List<Organization>> GetAllOrganizationsAsync(CancellationToken ct)
+        public async Task<List<Organization>> GetOrganizationsPaginatedAsync(Guid? cursor, int pageSize, CancellationToken ct)
         {
-            return await _dbContext.Organizations
+            var query = _dbContext.Organizations
                 .AsNoTracking()
+                .OrderBy(org => org.Id)
+                .AsQueryable();
+
+            if (cursor.HasValue)
+            {
+                query = query.Where(org => org.Id > cursor.Value);
+            }
+
+            return await query
+                .Take(pageSize + 1)
                 .ToListAsync(ct);
         }
 
         public async Task<Organization?> GetOrganizationByIdAsync(Guid id, CancellationToken ct)
         {
             return await _dbContext.Organizations
-                .Include(org => org.Users)
                 .FirstOrDefaultAsync(org => org.Id == id, ct);
         }
 
         public async Task<Organization?> GetOrganizationByNameAsync(string name, CancellationToken ct)
         {
             return await _dbContext.Organizations
-                .Include(org => org.Users)
+                .AsNoTracking()
                 .FirstOrDefaultAsync(org => org.Name == name, ct);
         }
 

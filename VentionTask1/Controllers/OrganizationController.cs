@@ -20,17 +20,12 @@ namespace VentionTask1.WebApi.Controllers
             _organizationService = organizationService;
         }
 
-        [HttpGet]
-        public async Task<IActionResult> GetAllOrganizations(CancellationToken ct)
+        [HttpGet("paged")]
+        public async Task<IActionResult> GetOrganizationsPageAsync([FromQuery] Guid? cursor, [FromQuery] int pageSize = 10, CancellationToken ct = default)
         {
-            var organizations = await _organizationService.GetAllOrganizationsAsync(ct);
+            var result = await _organizationService.GetOrganizationsPaginatedAsync(cursor, pageSize, ct);
 
-            if (organizations == null || !organizations.Any())
-            {
-                return NoContent();
-            }
-
-            return Ok(organizations);
+            return Ok(result);
         }
 
         [HttpGet("{id}")]
