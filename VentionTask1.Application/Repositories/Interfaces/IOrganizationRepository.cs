@@ -5,7 +5,7 @@ namespace VentionTask1.Application.Repositories.Interfaces
 {
     public interface IOrganizationRepository
     {
-        Task<List<Organization>> GetOrganizationsPaginatedAsync(Guid? cursor, int pageSize, CancellationToken ct);
+        Task<List<Organization>> GetAllOrganizationsAsync(CancellationToken ct);
         Task<Organization?> GetOrganizationByIdAsync(Guid id, CancellationToken ct);
         Task<Organization?> GetOrganizationByNameAsync(string name, CancellationToken ct);
         Task<Organization> CreateOrganizationAsync(Organization organization, CancellationToken ct);

@@ -4,7 +4,7 @@ namespace VentionTask1.Application.Services.Interfaces
 {
     public interface IOrganizationService
     {
-        Task<PaginatedResponseDTO<OrganizationDTO>> GetOrganizationsPaginatedAsync(Guid? cursor, int pageSize, CancellationToken ct);
+        Task<List<OrganizationDTO>> GetAllOrganizationsAsync(CancellationToken ct);
         Task<OrganizationDTO?> GetOrganizationByIdAsync(Guid id, CancellationToken ct);
         Task<OrganizationDTO> CreateOrganizationAsync(CreateOrganizationDTO organizationDTO, CancellationToken ct);
         Task<OrganizationDTO> UpdateOrganizationAsync(Guid id, UpdateOrganizationDTO organizationDTO, CancellationToken ct);

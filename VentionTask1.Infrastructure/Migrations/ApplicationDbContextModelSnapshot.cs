@@ -102,7 +102,7 @@ namespace VentionTask1.Infrastructure.Migrations
                     b.HasIndex("RefreshToken")
                         .IsUnique();
 
-                    b.HasIndex("UserId", "IsRevoked");
+                    b.HasIndex("UserId");
 
                     b.ToTable("Sessions", (string)null);
 

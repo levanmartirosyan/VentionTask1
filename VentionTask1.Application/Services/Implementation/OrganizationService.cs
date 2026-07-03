@@ -1,8 +1,11 @@
 ﻿using FluentValidation;
+using System.Data.Common;
+using System.Transactions;
 using VentionTask1.Application.DTOs;
 using VentionTask1.Application.Extensions;
 using VentionTask1.Application.Repositories.Interfaces;
 using VentionTask1.Application.Services.Interfaces;
+using VentionTask1.Domain.Entities;
 
 namespace VentionTask1.Application.Services.Implementation
 {
@@ -23,35 +26,11 @@ namespace VentionTask1.Application.Services.Implementation
             _updateOrganizationValidator = updateOrganizationValidator;
         }
 
-        public async Task<PaginatedResponseDTO<OrganizationDTO>> GetOrganizationsPaginatedAsync(Guid? cursor, int pageSize, CancellationToken ct)
+        public async Task<List<OrganizationDTO>> GetAllOrganizationsAsync(CancellationToken ct)
         {
-            if (pageSize <= 0)
-            {
-                pageSize = 10;
-            }
+            var organizations = await _organizationRepository.GetAllOrganizationsAsync(ct);
 
-            if (pageSize > 100)
-            {
-                pageSize = 100;
-            }
-
-            var organizations = await _organizationRepository.GetOrganizationsPaginatedAsync(cursor, pageSize, ct);
-
-            var hasNextPage = organizations.Count > pageSize;
-
-            var items = organizations
-                .Take(pageSize)
-                .Select(organization => organization.ToDto())
-                .ToList();
-
-            return new PaginatedResponseDTO<OrganizationDTO>
-            {
-                Items = items,
-                HasNextPage = hasNextPage,
-                NextCursor = hasNextPage && items.Any()
-                    ? items.Last().Id
-                    : null
-            };
+            return organizations.Select(org => org.ToDto()).ToList();
         }
 
         public async Task<OrganizationDTO?> GetOrganizationByIdAsync(Guid id, CancellationToken ct)
@@ -107,7 +86,7 @@ namespace VentionTask1.Application.Services.Implementation
 
             var existingOrganization = await _organizationRepository.GetOrganizationByNameAsync(organizationDTO.Name, ct);
 
-            if (existingOrganization != null && existingOrganization.Id != organization.Id)
+            if (existingOrganization != null)
             {
                 throw new InvalidOperationException($"An organization with the name '{organizationDTO.Name}' already exists.");
             }

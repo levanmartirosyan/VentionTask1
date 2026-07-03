@@ -25,8 +25,6 @@ namespace VentionTask1.Infrastructure.Data.Configurations
             builder.Property(s => s.IsRevoked)
                    .IsRequired();
 
-            builder.HasIndex(s => new { s.UserId, s.IsRevoked });
-
             builder.HasOne(s => s.User)
                    .WithMany(u => u.Sessions)
                    .HasForeignKey(s => s.UserId)
