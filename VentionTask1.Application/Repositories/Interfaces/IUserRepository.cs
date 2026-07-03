@@ -4,7 +4,7 @@ namespace VentionTask1.Application.Repositories.Interfaces
 {
     public interface IUserRepository
     {
-        Task<List<User>> GetAllUsersAsync(CancellationToken ct);
+        Task<List<User>> GetUsersPaginatedAsync(Guid? cursor, int pageSize, CancellationToken ct);
         Task<User?> GetUserByIdAsync(Guid id, CancellationToken ct);
         Task<User?> GetUserByEmailAsync(string email, CancellationToken ct);
         Task<User> CreateUserAsync(User user, CancellationToken ct);

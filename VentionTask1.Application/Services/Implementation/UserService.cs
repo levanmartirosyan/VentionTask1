@@ -26,11 +26,35 @@ namespace VentionTask1.Application.Services.Implementation
             _passwordService = passwordService;
         }
 
-        public async Task<List<UserDTO>> GetAllUsersAsync(CancellationToken ct)
+        public async Task<PaginatedResponseDTO<UserDTO>> GetUsersPaginatedAsync(Guid? cursor, int pageSize, CancellationToken ct)
         {
-            var users = await _usersRepository.GetAllUsersAsync(ct);
+            if (pageSize <= 0)
+            {
+                pageSize = 10;
+            }
 
-            return users.Select(user => user.ToDto()).ToList();
+            if (pageSize > 100)
+            {
+                pageSize = 100;
+            }
+
+            var users = await _usersRepository.GetUsersPaginatedAsync(cursor, pageSize, ct);
+
+            var hasNextPage = users.Count > pageSize;
+
+            var items = users
+                .Take(pageSize)
+                .Select(user => user.ToDto())
+                .ToList();
+
+            return new PaginatedResponseDTO<UserDTO>
+            {
+                Items = items,
+                HasNextPage = hasNextPage,
+                NextCursor = hasNextPage && items.Any()
+                    ? items.Last().Id
+                    : null
+            };
         }
 
         public async Task<UserDTO?> GetUserByIdAsync(Guid id, CancellationToken ct)

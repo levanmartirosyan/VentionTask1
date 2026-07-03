@@ -18,17 +18,12 @@ namespace VentionTask1.WebApi.Controllers
             _userService = userService;
         }
 
-        [HttpGet]
-        public async Task<IActionResult> GetAllUsersAsync(CancellationToken ct)
+        [HttpGet("paged")]
+        public async Task<IActionResult> GetUsersPageAsync([FromQuery] Guid? cursor, [FromQuery] int pageSize = 10, CancellationToken ct = default)
         {
-            var users = await _userService.GetAllUsersAsync(ct);
+            var result = await _userService.GetUsersPaginatedAsync(cursor, pageSize, ct);
 
-            if (users == null || !users.Any())
-            {
-                return NoContent();
-            }
-
-            return Ok(users);
+            return Ok(result);
         }
 
         [HttpGet("{id}")]
