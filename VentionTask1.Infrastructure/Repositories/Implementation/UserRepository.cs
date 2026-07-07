@@ -14,11 +14,21 @@ namespace VentionTask1.Infrastructure.Repositories.Implementation
             _dbContext = dbContext;
         }
 
-        public async Task<List<User>> GetAllUsersAsync(CancellationToken ct)
+        public async Task<List<User>> GetUsersPaginatedAsync(Guid? cursor, int pageSize, CancellationToken ct)
         {
-            return await _dbContext.Users
+            var query = _dbContext.Users
                 .AsNoTracking()
                 .Include(user => user.Organization)
+                .OrderBy(user => user.Id)
+                .AsQueryable();
+
+            if (cursor.HasValue)
+            {
+                query = query.Where(user => user.Id > cursor.Value);
+            }
+
+            return await query
+                .Take(pageSize + 1)
                 .ToListAsync(ct);
         }
 

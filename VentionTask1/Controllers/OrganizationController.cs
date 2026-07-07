@@ -2,51 +2,53 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using VentionTask1.Application.DTOs;
+using VentionTask1.Application.Services.Implementation;
 using VentionTask1.Application.Services.Interfaces;
+using VentionTask1.Domain.Entities;
 using VentionTask1.WebApi.Extensions;
 
 namespace VentionTask1.WebApi.Controllers
 {
-    [Route("api/user")]
+    [Route("api/Organization")]
     [ApiController]
-    public class UserController : ControllerBase
+    public class OrganizationController : ControllerBase
     {
-        private readonly IUserService _userService;
+        private readonly IOrganizationService _organizationService;
 
-        public UserController(IUserService userService)
+        public OrganizationController(IOrganizationService organizationService)
         {
-            _userService = userService;
+            _organizationService = organizationService;
         }
 
         [HttpGet("paged")]
-        public async Task<IActionResult> GetUsersPageAsync([FromQuery] Guid? cursor, [FromQuery] int pageSize = 10, CancellationToken ct = default)
+        public async Task<IActionResult> GetOrganizationsPageAsync([FromQuery] Guid? cursor, [FromQuery] int pageSize = 10, CancellationToken ct = default)
         {
-            var result = await _userService.GetUsersPaginatedAsync(cursor, pageSize, ct);
+            var result = await _organizationService.GetOrganizationsPaginatedAsync(cursor, pageSize, ct);
 
             return Ok(result);
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetUserByIdAsync(Guid id, CancellationToken ct)
+        public async Task<IActionResult> GetOrganizationById(Guid id, CancellationToken ct)
         {
-            var user = await _userService.GetUserByIdAsync(id, ct);
+            var organization = await _organizationService.GetOrganizationByIdAsync(id, ct);
 
-            if (user == null)
+            if (organization == null)
             {
                 return NotFound();
             }
 
-            return Ok(user);
+            return Ok(organization);
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateUserAsync([FromBody] CreateUserDTO userDTO, CancellationToken ct)
+        public async Task<IActionResult> CreateOrganization(CreateOrganizationDTO organizationDTO, CancellationToken ct)
         {
             try
             {
-                var createdUser = await _userService.CreateUserAsync(userDTO, ct);
+                var createdOrganization = await _organizationService.CreateOrganizationAsync(organizationDTO, ct);
 
-                return Ok(createdUser);
+                return Ok(createdOrganization);
             }
             catch (ValidationException ex)
             {
@@ -66,13 +68,13 @@ namespace VentionTask1.WebApi.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateUserAsync(Guid id, [FromBody] UpdateUserDTO userDTO, CancellationToken ct)
+        public async Task<IActionResult> UpdateOrganization(Guid id, UpdateOrganizationDTO organizationDTO, CancellationToken ct)
         {
             try
             {
-                var updatedUser = await _userService.UpdateUserAsync(id, userDTO, ct);
+                var updatedOrganization = await _organizationService.UpdateOrganizationAsync(id, organizationDTO, ct);
 
-                return Ok(updatedUser);
+                return Ok(updatedOrganization);
             }
             catch (ValidationException ex)
             {
@@ -96,11 +98,11 @@ namespace VentionTask1.WebApi.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteUserAsync(Guid id, CancellationToken ct)
+        public async Task<IActionResult> DeleteOrganization(Guid id, CancellationToken ct)
         {
             try
             {
-                var result = await _userService.DeleteUserAsync(id, ct);
+                var result = await _organizationService.DeleteOrganizationAsync(id, ct);
 
                 if (!result)
                 {
