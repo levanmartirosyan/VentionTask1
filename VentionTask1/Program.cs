@@ -1,6 +1,7 @@
+using VentionTask1;
 using VentionTask1.Application;
 using VentionTask1.Infrastructure;
-using VentionTask1;
+using VentionTask1.WebApi.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,6 +18,8 @@ if (app.Environment.IsDevelopment())
 
 app.UseSwagger();
 app.UseSwaggerUI();
+
+app.UseMiddleware<GlobalExceptionHandlingMiddleware>();
 
 app.UseHttpsRedirection();
 

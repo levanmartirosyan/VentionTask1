@@ -8,6 +8,6 @@ namespace VentionTask1.Application.Services.Interfaces
         Task<UserDTO?> GetUserByIdAsync(Guid id, CancellationToken ct);
         Task<UserDTO> CreateUserAsync(CreateUserDTO userDTO, CancellationToken ct);
         Task<UserDTO> UpdateUserAsync(Guid id, UpdateUserDTO userDTO, CancellationToken ct);
-        Task<bool> DeleteUserAsync(Guid id, CancellationToken ct);
+        Task DeleteUserAsync(Guid id, CancellationToken ct);
     }
 }

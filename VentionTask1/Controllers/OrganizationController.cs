@@ -9,7 +9,7 @@ using VentionTask1.WebApi.Extensions;
 
 namespace VentionTask1.WebApi.Controllers
 {
-    [Route("api/Organization")]
+    [Route("api/organizations")]
     [ApiController]
     public class OrganizationController : ControllerBase
     {
@@ -20,7 +20,7 @@ namespace VentionTask1.WebApi.Controllers
             _organizationService = organizationService;
         }
 
-        [HttpGet("paged")]
+        [HttpGet]
         public async Task<IActionResult> GetOrganizationsPageAsync([FromQuery] Guid? cursor, [FromQuery] int pageSize = 10, CancellationToken ct = default)
         {
             var result = await _organizationService.GetOrganizationsPaginatedAsync(cursor, pageSize, ct);
@@ -33,88 +33,31 @@ namespace VentionTask1.WebApi.Controllers
         {
             var organization = await _organizationService.GetOrganizationByIdAsync(id, ct);
 
-            if (organization == null)
-            {
-                return NotFound();
-            }
-
             return Ok(organization);
         }
 
         [HttpPost]
         public async Task<IActionResult> CreateOrganization(CreateOrganizationDTO organizationDTO, CancellationToken ct)
         {
-            try
-            {
-                var createdOrganization = await _organizationService.CreateOrganizationAsync(organizationDTO, ct);
+            var createdOrganization = await _organizationService.CreateOrganizationAsync(organizationDTO, ct);
 
-                return Ok(createdOrganization);
-            }
-            catch (ValidationException ex)
-            {
-                return BadRequest(ex.ToErrorDictionary());
-            }
-            catch (InvalidOperationException ex)
-            {
-                return Conflict(new
-                {
-                    Message = ex.Message
-                });
-            }
-            catch (Exception)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError);
-            }
+            return Ok(createdOrganization);
         }
 
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateOrganization(Guid id, UpdateOrganizationDTO organizationDTO, CancellationToken ct)
         {
-            try
-            {
-                var updatedOrganization = await _organizationService.UpdateOrganizationAsync(id, organizationDTO, ct);
+            var updatedOrganization = await _organizationService.UpdateOrganizationAsync(id, organizationDTO, ct);
 
-                return Ok(updatedOrganization);
-            }
-            catch (ValidationException ex)
-            {
-                return BadRequest(ex.ToErrorDictionary());
-            }
-            catch (KeyNotFoundException)
-            {
-                return NotFound();
-            }
-            catch (InvalidOperationException ex)
-            {
-                return Conflict(new
-                {
-                    Message = ex.Message
-                });
-            }
-            catch (Exception)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError);
-            }
+            return Ok(updatedOrganization);
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteOrganization(Guid id, CancellationToken ct)
         {
-            try
-            {
-                var result = await _organizationService.DeleteOrganizationAsync(id, ct);
+            await _organizationService.DeleteOrganizationAsync(id, ct);
 
-                if (!result)
-                {
-                    return NotFound();
-                }
-
-                return Ok();
-            }
-            catch (Exception)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError);
-            }
+            return NoContent();
         }
     }
 }
