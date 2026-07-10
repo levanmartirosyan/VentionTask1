@@ -23,7 +23,6 @@ namespace VentionTask1.Infrastructure
                     });
             });
 
-            services.AddScoped<IProductRepository, ProductRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IOrganizationRepository, OrganizationRepository>();
 

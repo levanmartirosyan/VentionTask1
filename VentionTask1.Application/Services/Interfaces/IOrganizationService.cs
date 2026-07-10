@@ -8,6 +8,6 @@ namespace VentionTask1.Application.Services.Interfaces
         Task<OrganizationDTO?> GetOrganizationByIdAsync(Guid id, CancellationToken ct);
         Task<OrganizationDTO> CreateOrganizationAsync(CreateOrganizationDTO organizationDTO, CancellationToken ct);
         Task<OrganizationDTO> UpdateOrganizationAsync(Guid id, UpdateOrganizationDTO organizationDTO, CancellationToken ct);
-        Task<bool> DeleteOrganizationAsync(Guid id, CancellationToken ct);
+        Task DeleteOrganizationAsync(Guid id, CancellationToken ct);
     }
 }

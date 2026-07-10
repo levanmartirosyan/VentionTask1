@@ -5,7 +5,7 @@ using VentionTask1.Settings;
 
 namespace VentionTask1.Controllers
 {
-    [Route("api/ApplicationSettings")]
+    [Route("api/application-settings")]
     [ApiController]
     public class ApplicationSettingsController : ControllerBase
     {

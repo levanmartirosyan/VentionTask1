@@ -58,7 +58,10 @@ namespace VentionTask1.Application.Services.Implementation
         {
             var organization = await _organizationRepository.GetOrganizationByIdAsync(id, ct);
 
-            if (organization == null) return null;
+            if (organization == null)
+            {
+                throw new KeyNotFoundException($"Organization with ID '{id}' not found.");
+            }
 
             return organization.ToDto();
         }
@@ -124,13 +127,13 @@ namespace VentionTask1.Application.Services.Implementation
             return organization.ToDto();
         }
 
-        public async Task<bool> DeleteOrganizationAsync(Guid id, CancellationToken ct)
+        public async Task DeleteOrganizationAsync(Guid id, CancellationToken ct)
         {
             var organization = await _organizationRepository.GetOrganizationByIdAsync(id, ct);
 
             if (organization == null)
             {
-                return false;
+                throw new KeyNotFoundException($"Organization with ID '{id}' was not found.");
             }
 
             await _organizationRepository.DeleteOrganizationAsync(organization);
@@ -139,24 +142,6 @@ namespace VentionTask1.Application.Services.Implementation
             {
                 throw new InvalidOperationException("Internal server error occurred while saving changes.");
             }
-
-            return true;
         }
-
-        // example of transaction
-        //await using var transaction = await _dbContext.Database.BeginTransactionAsync(IsolationLevel.ReadCommitted, ct);
-
-        //try
-        //{
-        // multiple database operations
-
-        //    await _dbContext.SaveChangesAsync(ct);
-        //    await transaction.CommitAsync(ct);
-        //}
-        //catch
-        //{
-        //    await transaction.RollbackAsync(ct);
-        //    throw;
-        //}
     }
 }

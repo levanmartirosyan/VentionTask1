@@ -13,17 +13,21 @@ namespace VentionTask1.Application.Services.Implementation
         private readonly IValidator<CreateUserDTO> _createUserValidator;
         private readonly IValidator<UpdateUserDTO> _updateUserValidator;
         private readonly IPasswordService _passwordService;
+        private readonly IOrganizationRepository _organizationRepository;
 
         public UserService(
             IUserRepository usersRepository,
             IValidator<CreateUserDTO> createUserValidator, 
             IValidator<UpdateUserDTO> updateUserValidator,
-            IPasswordService passwordService)
+            IPasswordService passwordService,
+            IOrganizationRepository organizationRepository
+            )
         {
             _usersRepository = usersRepository;
             _createUserValidator = createUserValidator;
             _updateUserValidator = updateUserValidator;
             _passwordService = passwordService;
+            _organizationRepository = organizationRepository;
         }
 
         public async Task<PaginatedResponseDTO<UserDTO>> GetUsersPaginatedAsync(Guid? cursor, int pageSize, CancellationToken ct)
@@ -61,7 +65,10 @@ namespace VentionTask1.Application.Services.Implementation
         {
             var user = await _usersRepository.GetUserByIdAsync(id, ct);
 
-            if (user == null) return null;
+            if (user == null)
+            {
+                throw new KeyNotFoundException($"User with ID '{id}' was not found.");
+            }
 
             return user.ToDto();
         }
@@ -80,6 +87,13 @@ namespace VentionTask1.Application.Services.Implementation
             if (existingUser != null)
             {
                 throw new InvalidOperationException("A user with the same email already exists.");
+            }
+
+            var organization = await _organizationRepository.GetOrganizationByIdAsync(userDTO.OrganizationId, ct);
+
+            if (organization == null)
+            {
+                throw new KeyNotFoundException($"Organization with ID '{userDTO.OrganizationId}' not found.");
             }
 
             var newUser = new User
@@ -142,6 +156,13 @@ namespace VentionTask1.Application.Services.Implementation
 
             if (userDTO.OrganizationId.HasValue)
             {
+                var organization = await _organizationRepository.GetOrganizationByIdAsync(userDTO.OrganizationId.Value, ct);
+
+                if (organization == null)
+                {
+                    throw new KeyNotFoundException($"Organization with ID '{userDTO.OrganizationId.Value}' not found.");
+                }
+
                 user.OrganizationId = userDTO.OrganizationId.Value;
             }
 
@@ -155,13 +176,13 @@ namespace VentionTask1.Application.Services.Implementation
             return user.ToDto();
         }
 
-        public async Task<bool> DeleteUserAsync(Guid id, CancellationToken ct)
+        public async Task DeleteUserAsync(Guid id, CancellationToken ct)
         {
             var user = await _usersRepository.GetUserByIdAsync(id, ct);
 
             if (user == null)
             {
-                return false;
+                throw new KeyNotFoundException($"User with ID '{id}' was not found.");
             }
 
             await _usersRepository.DeleteUserAsync(user);
@@ -170,8 +191,6 @@ namespace VentionTask1.Application.Services.Implementation
             {
                 throw new InvalidOperationException("Internal server error occurred while saving changes.");
             }
-
-            return true;
         }
     }
 }
