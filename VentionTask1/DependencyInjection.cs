@@ -19,6 +19,8 @@ namespace VentionTask1
                 options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
             });
 
+            services.AddGrpc();
+
             services.AddOpenApi();
             services.AddEndpointsApiExplorer();
             services.AddSwaggerGen();

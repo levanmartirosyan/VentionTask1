@@ -1,6 +1,7 @@
 using VentionTask1;
 using VentionTask1.Application;
 using VentionTask1.Infrastructure;
+using VentionTask1.WebApi.GrpcServices;
 using VentionTask1.WebApi.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -24,6 +25,8 @@ app.UseMiddleware<GlobalExceptionHandlingMiddleware>();
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
+
+app.MapGrpcService<UsersGrpcService>();
 
 app.MapControllers();
 
