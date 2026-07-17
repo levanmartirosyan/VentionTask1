@@ -42,10 +42,6 @@ namespace VentionTask1.WebApi.Middleware
             {
                 await WriteProblem(context, 409, "Conflict", ex.Message);
             }
-            catch (InvalidOperationException)
-            {
-                await WriteProblem(context, 500, "Internal server error", "An unexpected error occurred.");
-            }
             catch (Exception)
             {
                 await WriteProblem(context, 500, "Internal server error", "An unexpected error occurred.");
