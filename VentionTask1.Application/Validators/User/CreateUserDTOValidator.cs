@@ -7,7 +7,7 @@ namespace VentionTask1.Application.Validators.User
     {
         public CreateUserDTOValidator()
         {
-            RuleFor(x => x.Username)
+            RuleFor(x => x.Name)
                 .NotEmpty()
                 .MaximumLength(100);
 
@@ -26,9 +26,6 @@ namespace VentionTask1.Application.Validators.User
                 .WithMessage("Password must contain at least one number.")
                 .Matches(@"[^a-zA-Z0-9]")
                 .WithMessage("Password must contain at least one symbol.");
-
-            RuleFor(x => x.OrganizationId)
-                .NotEmpty();
         }
     }
 }

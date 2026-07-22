@@ -2,6 +2,7 @@
   <Folder Name="/Solution Items/">
     <File Path="Dockerfile" />
   </Folder>
+  <Project Path="ApiGateway/ApiGateway.csproj" Id="95ca7e4c-d068-4ef3-b32c-3ac2f4978128" />
   <Project Path="VentionTask1.Application/VentionTask1.Application.csproj" />
   <Project Path="VentionTask1.Domain/VentionTask1.Domain.csproj" />
   <Project Path="VentionTask1.Infrastructure/VentionTask1.Infrastructure.csproj" />

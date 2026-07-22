@@ -1,15 +1,15 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using VentionTask1.Application.Repositories.Interfaces;
+using VentionTask1.Application.Services.Interfaces;
 using VentionTask1.Domain.Entities;
-using VentionTask1.Infrastructure.Data;
 
 namespace VentionTask1.Infrastructure.Repositories.Implementation
 {
     public class OrganizationRepository : IOrganizationRepository
     {
-        private readonly ApplicationDbContext _dbContext;
+        private readonly IApplicationDbContext _dbContext;
 
-        public OrganizationRepository(ApplicationDbContext dbContext)
+        public OrganizationRepository(IApplicationDbContext dbContext)
         {
             _dbContext = dbContext;
         }
@@ -18,7 +18,7 @@ namespace VentionTask1.Infrastructure.Repositories.Implementation
         {
             var query = _dbContext.Organizations
                 .AsNoTracking()
-                .OrderBy(org => org.Id)
+                .OrderByDescending(org => org.CreatedAt)
                 .AsQueryable();
 
             if (cursor.HasValue)

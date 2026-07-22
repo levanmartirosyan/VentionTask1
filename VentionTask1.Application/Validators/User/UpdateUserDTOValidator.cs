@@ -7,9 +7,9 @@ namespace VentionTask1.Application.Validators.User
     {
         public UpdateUserDTOValidator()
         {
-            RuleFor(x => x.Username)
+            RuleFor(x => x.Name)
                 .MaximumLength(100)
-                .When(x => !string.IsNullOrWhiteSpace(x.Username));
+                .When(x => !string.IsNullOrWhiteSpace(x.Name));
 
             RuleFor(x => x.Email)
                 .EmailAddress()

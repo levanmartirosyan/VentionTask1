@@ -10,7 +10,9 @@ namespace VentionTask1.Application.Extensions
             return new OrganizationDTO
             {
                 Id = organization.Id,
-                Name = organization.Name
+                Name = organization.Name,
+                CreatedAt = organization.CreatedAt,
+                UpdatedAt = organization.UpdatedAt
             };
         }
 
