@@ -30,7 +30,7 @@ namespace VentionTask1.WebApi.GrpcServices
             return new UserGrpcResponse
             {
                 Id = user.Id.ToString(),
-                Username = user.Username,
+                Name = user.Name,
                 Email = user.Email,
                 OrganizationId = user.OrganizationId.ToString(),
                 OrganizationName = user.OrganizationName ?? string.Empty

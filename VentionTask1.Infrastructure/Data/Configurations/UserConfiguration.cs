@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using VentionTask1.Domain.Constants;
 using VentionTask1.Domain.Entities;
 
 namespace VentionTask1.Infrastructure.Data.Configurations
@@ -12,7 +13,7 @@ namespace VentionTask1.Infrastructure.Data.Configurations
 
             builder.HasKey(u => u.Id);
 
-            builder.Property(u => u.Username)
+            builder.Property(u => u.Name)
                    .IsRequired()
                    .HasMaxLength(100);
 
@@ -32,14 +33,16 @@ namespace VentionTask1.Infrastructure.Data.Configurations
             builder.HasOne(u => u.Organization)
                    .WithMany(o => o.Users)
                    .HasForeignKey(u => u.OrganizationId)
-                   .OnDelete(DeleteBehavior.Cascade);
+                   .IsRequired(false)
+                   .OnDelete(DeleteBehavior.SetNull);
 
             builder.HasData(new User
             {
                 Id = Guid.Parse("22222222-2222-2222-2222-222222222222"),
-                Username = "Admin",
+                Name = "Admin",
                 Email = "admin@example.com",
                 PasswordHash = "Admin123!",
+                Role = RoleType.OWNER,
                 OrganizationId = Guid.Parse("11111111-1111-1111-1111-111111111111"),
                 CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc)
             });

@@ -51,6 +51,8 @@ ScaffoldingReadMe.txt
 *~
 CodeCoverage/
 .agents/
+uploads/
+**/uploads/
 
 appsettings.Development.json
 appsettings.Local.json

@@ -10,10 +10,13 @@ namespace VentionTask1.Application.Extensions
             return new UserDTO
             {
                 Id = user.Id,
-                Username = user.Username,
+                Name = user.Name,
                 Email = user.Email,
+                Role = user.Role,
                 OrganizationId = user.OrganizationId,
-                OrganizationName = user.Organization?.Name
+                OrganizationName = user.Organization?.Name,
+                CreatedAt = user.CreatedAt,
+                UpdatedAt = user.UpdatedAt
             };
         }
     }

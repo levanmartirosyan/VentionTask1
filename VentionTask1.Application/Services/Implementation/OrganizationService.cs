@@ -49,8 +49,8 @@ namespace VentionTask1.Application.Services.Implementation
                 Items = items,
                 HasNextPage = hasNextPage,
                 NextCursor = hasNextPage && items.Any()
-                    ? items.Last().Id
-                    : null
+                ? items.Last().Id
+                : null
             };
         }
 

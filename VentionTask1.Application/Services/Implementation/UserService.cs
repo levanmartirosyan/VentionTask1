@@ -3,6 +3,7 @@ using VentionTask1.Application.DTOs;
 using VentionTask1.Application.Extensions;
 using VentionTask1.Application.Repositories.Interfaces;
 using VentionTask1.Application.Services.Interfaces;
+using VentionTask1.Domain.Constants;
 using VentionTask1.Domain.Entities;
 
 namespace VentionTask1.Application.Services.Implementation
@@ -56,8 +57,8 @@ namespace VentionTask1.Application.Services.Implementation
                 Items = items,
                 HasNextPage = hasNextPage,
                 NextCursor = hasNextPage && items.Any()
-                    ? items.Last().Id
-                    : null
+                ? items.Last().Id
+                : null
             };
         }
 
@@ -89,19 +90,12 @@ namespace VentionTask1.Application.Services.Implementation
                 throw new InvalidOperationException("A user with the same email already exists.");
             }
 
-            var organization = await _organizationRepository.GetOrganizationByIdAsync(userDTO.OrganizationId, ct);
-
-            if (organization == null)
-            {
-                throw new KeyNotFoundException($"Organization with ID '{userDTO.OrganizationId}' not found.");
-            }
-
             var newUser = new User
             {
-                Username = userDTO.Username,
+                Name = userDTO.Name,
                 Email = userDTO.Email,
                 PasswordHash = string.Empty,
-                OrganizationId = userDTO.OrganizationId
+                Role = RoleType.MEMBER,
             };
 
             newUser.PasswordHash = _passwordService.HashPassword(newUser, userDTO.Password);
@@ -132,9 +126,9 @@ namespace VentionTask1.Application.Services.Implementation
                 throw new KeyNotFoundException("User not found");
             }
 
-            if (!string.IsNullOrWhiteSpace(userDTO.Username))
+            if (!string.IsNullOrWhiteSpace(userDTO.Name))
             {
-                user.Username = userDTO.Username;
+                user.Name = userDTO.Name;
             }
 
             if (!string.IsNullOrWhiteSpace(userDTO.Email))

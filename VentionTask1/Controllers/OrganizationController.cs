@@ -44,7 +44,7 @@ namespace VentionTask1.WebApi.Controllers
             return Ok(createdOrganization);
         }
 
-        [HttpPut("{id}")]
+        [HttpPatch("{id}")]
         public async Task<IActionResult> UpdateOrganization(Guid id, UpdateOrganizationDTO organizationDTO, CancellationToken ct)
         {
             var updatedOrganization = await _organizationService.UpdateOrganizationAsync(id, organizationDTO, ct);

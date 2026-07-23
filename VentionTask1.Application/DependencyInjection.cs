@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using VentionTask1.Application.Services.Implementation;
 using VentionTask1.Application.Services.Interfaces;
+using VentionTask1.Application.Validators.File;
 using VentionTask1.Application.Validators.Organization;
 using VentionTask1.Application.Validators.User;
 using VentionTask1.Domain.Entities;
@@ -17,11 +18,14 @@ namespace VentionTask1.Application
             services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
             services.AddScoped<IPasswordService, PasswordService>();
             services.AddScoped<IOrganizationService, OrganizationService>();
+            services.AddScoped<IAuthService, AuthService>();
+            services.AddScoped<IFileUploadService, FileUploadService>();
 
             services.AddValidatorsFromAssemblyContaining<CreateUserDTOValidator>();
             services.AddValidatorsFromAssemblyContaining<UpdateUserDTOValidator>();
             services.AddValidatorsFromAssemblyContaining<CreateOrganizationDTOValidator>();
             services.AddValidatorsFromAssemblyContaining<UpdateOrganizationDTOValidator>();
+            services.AddValidatorsFromAssemblyContaining<UploadFileDTOValidator>();
 
             return services;
         }

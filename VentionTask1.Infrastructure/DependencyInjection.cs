@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using VentionTask1.Application.Repositories.Interfaces;
+using VentionTask1.Application.Services.Interfaces;
 using VentionTask1.Infrastructure.Data;
 using VentionTask1.Infrastructure.Repositories.Implementation;
 
@@ -23,8 +24,10 @@ namespace VentionTask1.Infrastructure
                     });
             });
 
+            services.AddScoped<IApplicationDbContext, ApplicationDbContext>();
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IOrganizationRepository, OrganizationRepository>();
+            services.AddScoped<IFileRepository, FileRepository>();
 
             return services;
         }

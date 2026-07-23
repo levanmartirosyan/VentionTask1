@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
+using VentionTask1.Application.Exceptions;
 using VentionTask1.WebApi.Extensions;
 
 namespace VentionTask1.WebApi.Middleware
@@ -34,17 +35,29 @@ namespace VentionTask1.WebApi.Middleware
 
                 await context.Response.WriteAsJsonAsync(problem);
             }
+            catch (UnauthorizedAccessException ex)
+            {
+                await WriteProblem(context, StatusCodes.Status401Unauthorized, "Unauthorized", ex.Message);
+            }
             catch (KeyNotFoundException ex)
             {
-                await WriteProblem(context, 404, "Resource not found", ex.Message);
+                await WriteProblem(context, StatusCodes.Status404NotFound, "Resource not found", ex.Message);
             }
             catch (InvalidOperationException ex) when (ex.Message.Contains("already exists", StringComparison.OrdinalIgnoreCase))
             {
-                await WriteProblem(context, 409, "Conflict", ex.Message);
+                await WriteProblem(context, StatusCodes.Status409Conflict, "Conflict", ex.Message);
+            }
+            catch (FileStorageException ex)
+            {
+                await WriteProblem(
+                    context,
+                    StatusCodes.Status500InternalServerError,
+                    "File storage error",
+                    ex.Message);
             }
             catch (Exception)
             {
-                await WriteProblem(context, 500, "Internal server error", "An unexpected error occurred.");
+                await WriteProblem(context, StatusCodes.Status500InternalServerError, "Internal server error", "An unexpected error occurred.");
             }
         }
 

@@ -1,15 +1,15 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using VentionTask1.Application.Repositories.Interfaces;
+using VentionTask1.Application.Services.Interfaces;
 using VentionTask1.Domain.Entities;
-using VentionTask1.Infrastructure.Data;
 
 namespace VentionTask1.Infrastructure.Repositories.Implementation
 {
     public class UserRepository : IUserRepository
     {
-        private readonly ApplicationDbContext _dbContext;
+        private readonly IApplicationDbContext _dbContext;
 
-        public UserRepository(ApplicationDbContext dbContext)
+        public UserRepository(IApplicationDbContext dbContext)
         {
             _dbContext = dbContext;
         }
@@ -19,7 +19,7 @@ namespace VentionTask1.Infrastructure.Repositories.Implementation
             var query = _dbContext.Users
                 .AsNoTracking()
                 .Include(user => user.Organization)
-                .OrderBy(user => user.Id)
+                .OrderByDescending(user => user.CreatedAt)
                 .AsQueryable();
 
             if (cursor.HasValue)
