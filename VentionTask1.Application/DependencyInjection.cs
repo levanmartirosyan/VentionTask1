@@ -20,6 +20,7 @@ namespace VentionTask1.Application
             services.AddScoped<IOrganizationService, OrganizationService>();
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IFileUploadService, FileUploadService>();
+            services.AddScoped<IFileIngestionService, FileIngestionService>();
 
             services.AddValidatorsFromAssemblyContaining<CreateUserDTOValidator>();
             services.AddValidatorsFromAssemblyContaining<UpdateUserDTOValidator>();

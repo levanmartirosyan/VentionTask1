@@ -1,9 +1,11 @@
 using FluentValidation;
+using MassTransit;
 using Microsoft.AspNetCore.Http;
 using System.Security.Cryptography;
 using VentionTask1.Application.DTOs;
 using VentionTask1.Application.Exceptions;
 using VentionTask1.Application.Extensions;
+using VentionTask1.Application.Messaging;
 using VentionTask1.Application.Repositories.Interfaces;
 using VentionTask1.Application.Services.Interfaces;
 using VentionTask1.Domain.Entities;
@@ -14,11 +16,13 @@ namespace VentionTask1.Application.Services.Implementation
     {
         private readonly IFileRepository _fileRepository;
         private readonly IValidator<UploadFileDTO> _uploadFileValidator;
+        private readonly IPublishEndpoint _publishEndpoint;
 
-        public FileUploadService(IFileRepository fileRepository, IValidator<UploadFileDTO> uploadFileValidator)
+        public FileUploadService(IFileRepository fileRepository, IValidator<UploadFileDTO> uploadFileValidator, IPublishEndpoint publishEndpoint)
         {
             _fileRepository = fileRepository;
             _uploadFileValidator = uploadFileValidator;
+            _publishEndpoint = publishEndpoint;
         }
 
         public async Task<PaginatedResponseDTO<FileDTO>> GetFilesPaginatedAsync(Guid? organizationId, Guid? cursor, int pageSize, CancellationToken ct)
@@ -101,7 +105,7 @@ namespace VentionTask1.Application.Services.Implementation
                 Filename = Path.GetFileName(file.FileName),
                 StoredFileName = storedFileName,
                 Size = file.Length,
-                Status = "processed",
+                Status = "pending",
                 ContentType = file.ContentType,
                 Checksum = checksum,
                 StorageKey = storageKey,
@@ -167,6 +171,16 @@ namespace VentionTask1.Application.Services.Implementation
                 throw new KeyNotFoundException($"File with ID '{id}' was not found.");
             }
 
+            if (file.Status == "processing")
+            {
+                throw new InvalidOperationException("File is already being processed.");
+            }
+
+            if (file.Status == "processed")
+            {
+                throw new InvalidOperationException("File is already processed.");
+            }
+
             file.Status = "processing";
             file.ProcessingError = null;
 
@@ -174,6 +188,14 @@ namespace VentionTask1.Application.Services.Implementation
             {
                 throw new InvalidOperationException("Internal server error occurred while updating file.");
             }
+
+            await _publishEndpoint.Publish(
+                    new FileProcessingRequestedEvent(
+                        file.Id,
+                        file.OrganizationId,
+                        file.StorageKey,
+                        file.ContentType),
+                        ct);
 
             return file.ToDto();
         }
