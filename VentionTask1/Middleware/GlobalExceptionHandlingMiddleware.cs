@@ -44,9 +44,7 @@ namespace VentionTask1.WebApi.Middleware
                 await WriteProblem(context, StatusCodes.Status404NotFound, "Resource not found", ex.Message);
             }
             catch (InvalidOperationException ex) when (
-            ex.Message.Contains("already exists", StringComparison.OrdinalIgnoreCase) ||
-            ex.Message.Contains("already being processed", StringComparison.OrdinalIgnoreCase) ||
-            ex.Message.Contains("already processed", StringComparison.OrdinalIgnoreCase))
+                ex.Message.Contains("already", StringComparison.OrdinalIgnoreCase))
             {
                 await WriteProblem(context, StatusCodes.Status409Conflict, "Conflict", ex.Message);
             }

@@ -37,10 +37,6 @@ namespace VentionTask1.Application.Consumers
 
             try
             {
-                Console.WriteLine($"Finalizing processing for file {message.FileId}");
-
-                
-
                 await _publishEndpoint.Publish(
                     new FileProcessingCompletedEvent(message.FileId),
                     ct);

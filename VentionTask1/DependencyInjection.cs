@@ -4,6 +4,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using VentionTask1.Application.Consumers;
 using VentionTask1.Settings;
+using VentionTask1.WebApi.Settings;
 
 namespace VentionTask1
 {
@@ -31,15 +32,14 @@ namespace VentionTask1
 
                 x.UsingRabbitMq((context, cfg) =>
                 {
-                    var host = builder.Configuration["RabbitMQ:Host"] ?? "localhost";
-                    var port = builder.Configuration.GetValue<ushort>("RabbitMQ:Port");
-                    var username = builder.Configuration["RabbitMQ:Username"] ?? "guest";
-                    var password = builder.Configuration["RabbitMQ:Password"] ?? "guest";
+                    var rabbitMqOptions = builder.Configuration
+                        .GetSection("RabbitMQ")
+                        .Get<RabbitMqOptions>() ?? new RabbitMqOptions();
 
-                    cfg.Host(host, port, "/", h =>
+                    cfg.Host(rabbitMqOptions.Host, rabbitMqOptions.Port, "/", h =>
                     {
-                        h.Username(username);
-                        h.Password(password);
+                        h.Username(rabbitMqOptions.Username);
+                        h.Password(rabbitMqOptions.Password);
                     });
 
                     cfg.UseMessageRetry(r =>
@@ -66,6 +66,8 @@ namespace VentionTask1
 
             services.Configure<ApplicationSettings>(
                 builder.Configuration.GetSection("ApplicationSettings"));
+            services.Configure<RabbitMqOptions>(
+                builder.Configuration.GetSection("RabbitMQ"));
 
             return builder;
         }

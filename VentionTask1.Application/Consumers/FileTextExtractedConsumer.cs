@@ -1,6 +1,7 @@
 ﻿using MassTransit;
 using VentionTask1.Application.Messaging;
 using VentionTask1.Application.Repositories.Interfaces;
+using VentionTask1.Application.Services.Interfaces;
 
 namespace VentionTask1.Application.Consumers
 {
@@ -9,13 +10,16 @@ namespace VentionTask1.Application.Consumers
     {
         private readonly IFileRepository _fileRepository;
         private readonly IPublishEndpoint _publishEndpoint;
+        private readonly IFileIngestionService _fileIngestionService;
 
         public FileTextExtractedConsumer(
             IFileRepository fileRepository,
-            IPublishEndpoint publishEndpoint)
+            IPublishEndpoint publishEndpoint,
+            IFileIngestionService fileIngestionService)
         {
             _fileRepository = fileRepository;
             _publishEndpoint = publishEndpoint;
+            _fileIngestionService = fileIngestionService;
         }
 
         public async Task Consume(ConsumeContext<FileTextExtractedEvent> context)
@@ -37,9 +41,7 @@ namespace VentionTask1.Application.Consumers
 
             try
             {
-                Console.WriteLine($"Chunking text for file {message.FileId}");
-
-                
+                await _fileIngestionService.IngestAsync(message.FileId, ct);
 
                 await _publishEndpoint.Publish(
                     new FileChunkingCompletedEvent(message.FileId),

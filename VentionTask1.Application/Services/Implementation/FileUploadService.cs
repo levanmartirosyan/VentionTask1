@@ -171,14 +171,9 @@ namespace VentionTask1.Application.Services.Implementation
                 throw new KeyNotFoundException($"File with ID '{id}' was not found.");
             }
 
-            if (file.Status == "processing")
+            if (file.Status == "processing" || file.Status == "processed")
             {
-                throw new InvalidOperationException("File is already being processed.");
-            }
-
-            if (file.Status == "processed")
-            {
-                throw new InvalidOperationException("File is already processed.");
+                throw new InvalidOperationException($"File is already {file.Status}.");
             }
 
             file.Status = "processing";

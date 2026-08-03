@@ -10,16 +10,13 @@ namespace VentionTask1.Application.Consumers
     {
         private readonly IFileRepository _fileRepository;
         private readonly IPublishEndpoint _publishEndpoint;
-        private readonly IFileIngestionService _fileIngestionService;
 
         public FileProcessingRequestedConsumer(
             IFileRepository fileRepository,
-            IPublishEndpoint publishEndpoint,
-            IFileIngestionService fileIngestionService)
+            IPublishEndpoint publishEndpoint)
         {
             _fileRepository = fileRepository;
             _publishEndpoint = publishEndpoint;
-            _fileIngestionService = fileIngestionService;
         }
 
         public async Task Consume(ConsumeContext<FileProcessingRequestedEvent> context)
@@ -41,7 +38,10 @@ namespace VentionTask1.Application.Consumers
 
             try
             {
-                await _fileIngestionService.IngestAsync(message.FileId, ct);
+                file.Status = "processing";
+                file.ProcessingError = null;
+
+                await _fileRepository.SaveChangesAsync(ct);
 
                 await _publishEndpoint.Publish(
                     new FileTextExtractedEvent(message.FileId),
