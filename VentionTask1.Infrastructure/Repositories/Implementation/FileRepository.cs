@@ -38,7 +38,7 @@ namespace VentionTask1.Infrastructure.Repositories.Implementation
 
         public async Task<UploadedFile?> GetByIdAsync(Guid id, CancellationToken ct)
         {
-            return await _dbContext.Files.FirstOrDefaultAsync(file => file.Id == id);
+            return await _dbContext.Files.FirstOrDefaultAsync(file => file.Id == id, ct);
         }
 
         public async Task<UploadedFile> AddAsync(UploadedFile file, CancellationToken ct)

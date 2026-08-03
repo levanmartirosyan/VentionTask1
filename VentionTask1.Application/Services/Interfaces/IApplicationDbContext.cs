@@ -9,6 +9,7 @@ namespace VentionTask1.Application.Services.Interfaces
         DbSet<Organization> Organizations { get; set; }
         DbSet<Session> Sessions { get; set; }
         DbSet<UploadedFile> Files { get; set; }
+        DbSet<FileChunk> FileChunks { get; set; }
 
         Task<int> SaveChangesAsync(CancellationToken ct);
     }
