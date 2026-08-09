@@ -28,7 +28,16 @@ namespace ApiGateway.Controllers
         {
             var client = _httpClientFactory.CreateClient("MainApi");
 
-            var response = await client.PostAsJsonAsync("api/auth/validate-login", loginRequest, ct);
+            var request = new HttpRequestMessage(HttpMethod.Post, "api/auth/validate-login");
+
+            request.Content = JsonContent.Create(loginRequest);
+
+            if (HttpContext.Request.Headers.TryGetValue("X-Correlation-ID", out var correlationId))
+            {
+                request.Headers.TryAddWithoutValidation("X-Correlation-ID", correlationId.ToString());
+            }
+
+            var response = await client.SendAsync(request, ct);
 
             if (!response.IsSuccessStatusCode)
             {
