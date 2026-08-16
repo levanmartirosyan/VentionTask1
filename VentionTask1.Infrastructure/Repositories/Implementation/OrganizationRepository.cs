@@ -37,6 +37,13 @@ namespace VentionTask1.Infrastructure.Repositories.Implementation
                 .FirstOrDefaultAsync(org => org.Id == id, ct);
         }
 
+        public Task<List<Organization>> GetOrganizationsByIdsAsync(IReadOnlyList<Guid> ids, CancellationToken ct)
+        {
+            return _dbContext.Organizations
+                .Where(org => ids.Contains(org.Id))
+                .ToListAsync(ct);
+        }
+
         public async Task<Organization?> GetOrganizationByNameAsync(string name, CancellationToken ct)
         {
             return await _dbContext.Organizations

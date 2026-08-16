@@ -4,6 +4,10 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using VentionTask1.Application.Consumers;
 using VentionTask1.Settings;
+using VentionTask1.WebApi.GraphQL;
+using VentionTask1.WebApi.GraphQL.Mutations;
+using VentionTask1.WebApi.GraphQL.Queries;
+using VentionTask1.WebApi.GraphQL.Types;
 using VentionTask1.WebApi.Settings;
 
 namespace VentionTask1
@@ -59,6 +63,14 @@ namespace VentionTask1
             });
 
             services.AddGrpc();
+            services
+                .AddGraphQLServer()
+                .AddQueryType(d => d.Name("Query"))
+                .AddMutationType(d => d.Name("Mutation"))
+                .AddTypeExtension<OrganizationQuery>()
+                .AddTypeExtension<UserQuery>()
+                .AddTypeExtension<OrganizationMutation>()
+                .AddTypeExtension<UserType>();
 
             services.AddOpenApi();
             services.AddEndpointsApiExplorer();
