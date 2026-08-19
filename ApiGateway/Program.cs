@@ -1,4 +1,5 @@
 using ApiGateway;
+using ApiGateway.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,6 +15,8 @@ else
 {
     app.UseHttpsRedirection();
 }
+
+app.UseMiddleware<CorrelationIdMiddleware>();
 
 app.UseCors("Frontend");
 

@@ -27,18 +27,41 @@ namespace VentionTask1
                 options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
             });
 
+            services.AddHttpContextAccessor();
+
             services.AddMassTransit(x =>
             {
+                var rabbitMqOptions = builder.Configuration
+                    .GetSection("RabbitMQ")
+                    .Get<RabbitMqOptions>() ?? new RabbitMqOptions();
+
                 x.AddConsumer<FileProcessingRequestedConsumer>();
                 x.AddConsumer<FileTextExtractedConsumer>();
                 x.AddConsumer<FileChunkingCompletedConsumer>();
                 x.AddConsumer<FileProcessingCompletedConsumer>();
 
+                x.AddConfigureEndpointsCallback((_, endpointConfigurator) =>
+                {
+                    endpointConfigurator.ConcurrentMessageLimit =
+                        rabbitMqOptions.ConcurrentMessageLimit;
+
+                    if (endpointConfigurator is IRabbitMqReceiveEndpointConfigurator rabbitMqEndpoint)
+                    {
+                        rabbitMqEndpoint.PrefetchCount =
+                            rabbitMqOptions.PrefetchCount;
+
+                        rabbitMqEndpoint.SetQueueArgument(
+                            "x-dead-letter-exchange",
+                            rabbitMqOptions.DeadLetterExchange);
+
+                        rabbitMqEndpoint.SetQueueArgument(
+                            "x-dead-letter-routing-key",
+                            rabbitMqOptions.DeadLetterRoutingKey);
+                    }
+                });
+
                 x.UsingRabbitMq((context, cfg) =>
                 {
-                    var rabbitMqOptions = builder.Configuration
-                        .GetSection("RabbitMQ")
-                        .Get<RabbitMqOptions>() ?? new RabbitMqOptions();
 
                     cfg.Host(rabbitMqOptions.Host, rabbitMqOptions.Port, "/", h =>
                     {
