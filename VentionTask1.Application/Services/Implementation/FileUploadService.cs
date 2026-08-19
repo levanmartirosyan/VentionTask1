@@ -17,12 +17,14 @@ namespace VentionTask1.Application.Services.Implementation
         private readonly IFileRepository _fileRepository;
         private readonly IValidator<UploadFileDTO> _uploadFileValidator;
         private readonly IPublishEndpoint _publishEndpoint;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public FileUploadService(IFileRepository fileRepository, IValidator<UploadFileDTO> uploadFileValidator, IPublishEndpoint publishEndpoint)
+        public FileUploadService(IFileRepository fileRepository, IValidator<UploadFileDTO> uploadFileValidator, IPublishEndpoint publishEndpoint, IHttpContextAccessor httpContextAccessor)
         {
             _fileRepository = fileRepository;
             _uploadFileValidator = uploadFileValidator;
             _publishEndpoint = publishEndpoint;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<PaginatedResponseDTO<FileDTO>> GetFilesPaginatedAsync(Guid? organizationId, Guid? cursor, int pageSize, CancellationToken ct)
@@ -185,12 +187,23 @@ namespace VentionTask1.Application.Services.Implementation
             }
 
             await _publishEndpoint.Publish(
-                    new FileProcessingRequestedEvent(
-                        file.Id,
-                        file.OrganizationId,
-                        file.StorageKey,
-                        file.ContentType),
-                        ct);
+                new FileProcessingRequestedEvent(
+                    file.Id,
+                    file.OrganizationId,
+                    file.StorageKey,
+                    file.ContentType),
+                context =>
+                {
+                    var correlationId = _httpContextAccessor.HttpContext?
+                        .Request.Headers["X-Correlation-ID"]
+                        .ToString();
+
+                    if (!string.IsNullOrWhiteSpace(correlationId))
+                    {
+                        context.Headers.Set("X-Correlation-ID", correlationId);
+                    }
+                },
+                ct);
 
             return file.ToDto();
         }

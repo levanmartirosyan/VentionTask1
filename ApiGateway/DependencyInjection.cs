@@ -35,7 +35,10 @@ namespace ApiGateway
                 client.BaseAddress = new Uri(
                     builder.Configuration["MainApi:BaseUrl"]
                     ?? throw new InvalidOperationException("MainApi:BaseUrl is missing"));
-            });
+
+                client.Timeout = TimeSpan.FromSeconds(10);
+            })
+            .AddStandardResilienceHandler();
 
             return builder;
         }
