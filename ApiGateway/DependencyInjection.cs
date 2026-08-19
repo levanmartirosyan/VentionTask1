@@ -37,8 +37,7 @@ namespace ApiGateway
                     ?? throw new InvalidOperationException("MainApi:BaseUrl is missing"));
 
                 client.Timeout = TimeSpan.FromSeconds(10);
-            })
-            .AddStandardResilienceHandler();
+            });
 
             return builder;
         }

@@ -39,7 +39,7 @@ namespace VentionTask1.WebApi.Middleware
             {
                 await WriteProblem(context, StatusCodes.Status401Unauthorized, "Unauthorized", ex.Message);
             }
-            catch (KeyNotFoundException ex)
+            catch (System.Collections.Generic.KeyNotFoundException ex)
             {
                 await WriteProblem(context, StatusCodes.Status404NotFound, "Resource not found", ex.Message);
             }

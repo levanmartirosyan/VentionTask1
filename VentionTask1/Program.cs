@@ -31,4 +31,6 @@ app.MapGrpcService<UsersGrpcService>();
 
 app.MapControllers();
 
+app.MapGraphQL("/graphql");
+
 app.Run();
