@@ -2,6 +2,7 @@ using VentionTask1;
 using VentionTask1.Application;
 using VentionTask1.Infrastructure;
 using VentionTask1.WebApi.GrpcServices;
+using VentionTask1.WebApi.Hubs;
 using VentionTask1.WebApi.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -25,6 +26,7 @@ app.UseMiddleware<GlobalExceptionHandlingMiddleware>();
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapGrpcService<UsersGrpcService>();
@@ -32,5 +34,7 @@ app.MapGrpcService<UsersGrpcService>();
 app.MapControllers();
 
 app.MapGraphQL("/graphql");
+
+app.MapHub<FileProcessingHub>("/hubs/file-processing").RequireAuthorization();
 
 app.Run();

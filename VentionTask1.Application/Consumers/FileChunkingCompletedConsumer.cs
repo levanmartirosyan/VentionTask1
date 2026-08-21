@@ -1,6 +1,7 @@
 ﻿using MassTransit;
 using VentionTask1.Application.Messaging;
 using VentionTask1.Application.Repositories.Interfaces;
+using VentionTask1.Application.Services.Interfaces;
 
 namespace VentionTask1.Application.Consumers
 {
@@ -9,13 +10,16 @@ namespace VentionTask1.Application.Consumers
     {
         private readonly IFileRepository _fileRepository;
         private readonly IPublishEndpoint _publishEndpoint;
+        private readonly IFileProcessingNotifier _notifier;
 
         public FileChunkingCompletedConsumer(
             IFileRepository fileRepository,
-            IPublishEndpoint publishEndpoint)
+            IPublishEndpoint publishEndpoint,
+            IFileProcessingNotifier notifier)
         {
             _fileRepository = fileRepository;
             _publishEndpoint = publishEndpoint;
+            _notifier = notifier;
         }
 
         public async Task Consume(ConsumeContext<FileChunkingCompletedEvent> context)
@@ -37,6 +41,8 @@ namespace VentionTask1.Application.Consumers
 
             try
             {
+                await _notifier.NotifyChunkingStartedAsync(message.FileId, file.OrganizationId, ct);
+
                 await _publishEndpoint.Publish(
                     new FileProcessingCompletedEvent(message.FileId),
                     ct);
@@ -47,6 +53,8 @@ namespace VentionTask1.Application.Consumers
                 file.ProcessingError = ex.Message;
 
                 await _fileRepository.SaveChangesAsync(ct);
+
+                await _notifier.NotifyFailedAsync(message.FileId, file.OrganizationId, ex.Message, ct);
 
                 throw;
             }
