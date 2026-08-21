@@ -11,15 +11,18 @@ namespace VentionTask1.Application.Consumers
         private readonly IFileRepository _fileRepository;
         private readonly IPublishEndpoint _publishEndpoint;
         private readonly IFileIngestionService _fileIngestionService;
+        private readonly IFileProcessingNotifier _notifier;
 
         public FileTextExtractedConsumer(
             IFileRepository fileRepository,
             IPublishEndpoint publishEndpoint,
-            IFileIngestionService fileIngestionService)
+            IFileIngestionService fileIngestionService,
+            IFileProcessingNotifier notifier)
         {
             _fileRepository = fileRepository;
             _publishEndpoint = publishEndpoint;
             _fileIngestionService = fileIngestionService;
+            _notifier = notifier;
         }
 
         public async Task Consume(ConsumeContext<FileTextExtractedEvent> context)
@@ -41,6 +44,8 @@ namespace VentionTask1.Application.Consumers
 
             try
             {
+                await _notifier.NotifyTextExtractionStartedAsync(message.FileId, file.OrganizationId, ct);
+
                 await _fileIngestionService.IngestAsync(message.FileId, ct);
 
                 await _publishEndpoint.Publish(
@@ -53,6 +58,8 @@ namespace VentionTask1.Application.Consumers
                 file.ProcessingError = ex.Message;
 
                 await _fileRepository.SaveChangesAsync(ct);
+
+                await _notifier.NotifyFailedAsync(message.FileId, file.OrganizationId, ex.Message, ct);
 
                 throw;
             }

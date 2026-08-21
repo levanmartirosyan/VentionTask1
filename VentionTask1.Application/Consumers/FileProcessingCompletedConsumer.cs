@@ -1,6 +1,7 @@
 ﻿using MassTransit;
 using VentionTask1.Application.Messaging;
 using VentionTask1.Application.Repositories.Interfaces;
+using VentionTask1.Application.Services.Interfaces;
 
 namespace VentionTask1.Application.Consumers
 {
@@ -8,10 +9,12 @@ namespace VentionTask1.Application.Consumers
         : IConsumer<FileProcessingCompletedEvent>
     {
         private readonly IFileRepository _fileRepository;
+        private readonly IFileProcessingNotifier _notifier;
 
-        public FileProcessingCompletedConsumer(IFileRepository fileRepository)
+        public FileProcessingCompletedConsumer(IFileRepository fileRepository, IFileProcessingNotifier notifier)
         {
             _fileRepository = fileRepository;
+            _notifier = notifier;
         }
 
         public async Task Consume(ConsumeContext<FileProcessingCompletedEvent> context)
@@ -45,8 +48,12 @@ namespace VentionTask1.Application.Consumers
 
                 await _fileRepository.SaveChangesAsync(ct);
 
+                await _notifier.NotifyFailedAsync(message.FileId, file.OrganizationId, ex.Message, ct);
+
                 throw;
             }
+
+            await _notifier.NotifyCompletedAsync(message.FileId, file.OrganizationId, ct);
         }
     }
 }

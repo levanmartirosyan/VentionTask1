@@ -10,13 +10,16 @@ namespace VentionTask1.Application.Consumers
     {
         private readonly IFileRepository _fileRepository;
         private readonly IPublishEndpoint _publishEndpoint;
+        private readonly IFileProcessingNotifier _notifier;
 
         public FileProcessingRequestedConsumer(
             IFileRepository fileRepository,
-            IPublishEndpoint publishEndpoint)
+            IPublishEndpoint publishEndpoint,
+            IFileProcessingNotifier notifier)
         {
             _fileRepository = fileRepository;
             _publishEndpoint = publishEndpoint;
+            _notifier = notifier;
         }
 
         public async Task Consume(ConsumeContext<FileProcessingRequestedEvent> context)
@@ -43,6 +46,8 @@ namespace VentionTask1.Application.Consumers
 
                 await _fileRepository.SaveChangesAsync(ct);
 
+                await _notifier.NotifyProcessingStartedAsync(file.Id, file.OrganizationId, ct);
+
                 await _publishEndpoint.Publish(
                     new FileTextExtractedEvent(message.FileId),
                     ct);
@@ -53,6 +58,8 @@ namespace VentionTask1.Application.Consumers
                 file.ProcessingError = ex.Message;
 
                 await _fileRepository.SaveChangesAsync(ct);
+
+                await _notifier.NotifyFailedAsync(message.FileId, file.OrganizationId, ex.Message, ct);
 
                 throw;
             }
