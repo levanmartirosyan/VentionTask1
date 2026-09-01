@@ -173,7 +173,7 @@ namespace VentionTask1.Application.Services.Implementation
                 throw new KeyNotFoundException($"File with ID '{id}' was not found.");
             }
 
-            if (file.Status == "processing" || file.Status == "processed")
+            if (file.Status == "processing")
             {
                 throw new InvalidOperationException($"File is already {file.Status}.");
             }

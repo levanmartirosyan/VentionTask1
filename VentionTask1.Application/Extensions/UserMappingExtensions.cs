@@ -13,8 +13,9 @@ namespace VentionTask1.Application.Extensions
                 Name = user.Name,
                 Email = user.Email,
                 Role = user.Role,
-                OrganizationId = user.OrganizationId,
-                OrganizationName = user.Organization?.Name,
+                Organisations = user.OrganizationMemberships
+                    .Select(member => member.ToEntity())
+                    .ToList(),
                 CreatedAt = user.CreatedAt,
                 UpdatedAt = user.UpdatedAt
             };

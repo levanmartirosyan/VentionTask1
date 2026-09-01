@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using VentionTask1.Application.DTOs;
+using VentionTask1.Application.DTOs.Membership;
 using VentionTask1.Application.Services.Implementation;
 using VentionTask1.Application.Services.Interfaces;
 using VentionTask1.Domain.Entities;
@@ -14,10 +15,14 @@ namespace VentionTask1.WebApi.Controllers
     public class OrganizationController : ControllerBase
     {
         private readonly IOrganizationService _organizationService;
+        private readonly IOrganizationMemberService _organizationMemberService;
 
-        public OrganizationController(IOrganizationService organizationService)
+        public OrganizationController(
+            IOrganizationService organizationService,
+            IOrganizationMemberService organizationMemberService)
         {
             _organizationService = organizationService;
+            _organizationMemberService = organizationMemberService;
         }
 
         [HttpGet]
@@ -56,6 +61,38 @@ namespace VentionTask1.WebApi.Controllers
         public async Task<IActionResult> DeleteOrganization(Guid id, CancellationToken ct)
         {
             await _organizationService.DeleteOrganizationAsync(id, ct);
+
+            return NoContent();
+        }
+
+        [HttpGet("{organizationId}/members")]
+        public async Task<IActionResult> GetMembersAsync(Guid organizationId, [FromQuery] Guid? cursor, [FromQuery] int pageSize = 10, CancellationToken ct = default)
+        {
+            var result = await _organizationMemberService.GetMembersAsync(organizationId, cursor, pageSize, ct);
+
+            return Ok(result);
+        }
+
+        [HttpPost("{organizationId}/members")]
+        public async Task<IActionResult> AddMemberAsync(Guid organizationId, [FromBody] AddOrganizationMemberDTO dto, CancellationToken ct)
+        {
+            var result = await _organizationMemberService.AddMemberAsync(organizationId, dto, ct);
+
+            return Ok(result);
+        }
+
+        [HttpPatch("{organizationId}/members/{userId}")]
+        public async Task<IActionResult> UpdateMemberRoleAsync(Guid organizationId, Guid userId, [FromBody] UpdateOrganizationMemberRoleDTO dto, CancellationToken ct)
+        {
+            var result = await _organizationMemberService.UpdateMemberRoleAsync(organizationId, userId, dto, ct);
+
+            return Ok(result);
+        }
+
+        [HttpDelete("{organizationId}/members/{userId}")]
+        public async Task<IActionResult> RemoveMemberAsync(Guid organizationId, Guid userId, CancellationToken ct)
+        {
+            await _organizationMemberService.RemoveMemberAsync(organizationId, userId, ct);
 
             return NoContent();
         }

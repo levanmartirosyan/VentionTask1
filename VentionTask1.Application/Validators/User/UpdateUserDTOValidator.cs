@@ -30,10 +30,6 @@ namespace VentionTask1.Application.Validators.User
                 .NotEmpty()
                 .When(x => !string.IsNullOrWhiteSpace(x.RepeatPassword))
                 .WithMessage("New password is required when repeat password is provided.");
-
-            RuleFor(x => x.OrganizationId)
-                .NotEmpty()
-                .When(x => x.OrganizationId.HasValue);
         }
     }
 }

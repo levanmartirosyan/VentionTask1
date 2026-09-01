@@ -20,6 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\ApiGateway\ApiGateway.csproj" />
     <ProjectReference Include="..\VentionTask1.Application\VentionTask1.Application.csproj" />
     <ProjectReference Include="..\VentionTask1.Domain\VentionTask1.Domain.csproj" />
   </ItemGroup>

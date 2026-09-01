@@ -3,7 +3,7 @@
     public class Organization : BaseEntity
     {
         public required string Name { get; set; }
-        public ICollection<User> Users { get; set; } = [];
+        public ICollection<OrganizationMember> Members { get; set; } = [];
         public ICollection<UploadedFile> Files { get; set; } = [];
     }
 }

@@ -4,8 +4,13 @@
     {
         public Guid UserId { get; set; }
         public User User { get; set; } = null!;
-        public required string RefreshToken { get; set; }
-        public DateTime ExpiresAt { get; set; }
-        public bool IsRevoked { get; set; }
+
+        public DateTime LoggedInAt { get; set; }
+        public DateTime? LoggedOutAt { get; set; }
+
+        public bool IsActive { get; set; }
+
+        public string? IpAddress { get; set; }
+        public string? UserAgent { get; set; }
     }
 }

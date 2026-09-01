@@ -4,18 +4,29 @@ namespace VentionTask1.WebApi.Hubs
 {
     public class FileProcessingHub : Hub
     {
-        public Task JoinOrganizationFilesGroup(Guid organizationId)
+        public async Task WatchFiles(IEnumerable<Guid> fileIds)
         {
-            return Groups.AddToGroupAsync(
-                Context.ConnectionId,
-                $"org-{organizationId}-files");
+            foreach (var fileId in fileIds.Distinct())
+            {
+                await Groups.AddToGroupAsync(
+                    Context.ConnectionId,
+                    GetFileGroupName(fileId));
+            }
         }
 
-        public Task LeaveOrganizationFilesGroup(Guid organizationId)
+        public async Task UnwatchFiles(IEnumerable<Guid> fileIds)
         {
-            return Groups.RemoveFromGroupAsync(
-                Context.ConnectionId,
-                $"org-{organizationId}-files");
+            foreach (var fileId in fileIds.Distinct())
+            {
+                await Groups.RemoveFromGroupAsync(
+                    Context.ConnectionId,
+                    GetFileGroupName(fileId));
+            }
+        }
+
+        private static string GetFileGroupName(Guid fileId)
+        {
+            return $"file-{fileId}";
         }
     }
 }

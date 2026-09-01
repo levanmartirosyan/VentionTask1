@@ -84,7 +84,7 @@ namespace VentionTask1.Infrastructure.Migrations
                         });
                 });
 
-            modelBuilder.Entity("VentionTask1.Domain.Entities.Session", b =>
+            modelBuilder.Entity("VentionTask1.Domain.Entities.OrganizationMember", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -93,16 +93,11 @@ namespace VentionTask1.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<DateTime>("ExpiresAt")
-                        .HasColumnType("timestamp with time zone");
+                    b.Property<Guid>("OrganizationId")
+                        .HasColumnType("uuid");
 
-                    b.Property<bool>("IsRevoked")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("RefreshToken")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
+                    b.Property<int>("Role")
+                        .HasColumnType("integer");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -112,23 +107,61 @@ namespace VentionTask1.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("RefreshToken")
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("OrganizationId", "UserId")
                         .IsUnique();
 
-                    b.HasIndex("UserId", "IsRevoked");
-
-                    b.ToTable("Sessions", (string)null);
+                    b.ToTable("OrganizationMembers", (string)null);
 
                     b.HasData(
                         new
                         {
                             Id = new Guid("33333333-3333-3333-3333-333333333333"),
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            ExpiresAt = new DateTime(2026, 2, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            IsRevoked = false,
-                            RefreshToken = "test-refresh-token",
+                            OrganizationId = new Guid("11111111-1111-1111-1111-111111111111"),
+                            Role = 2,
                             UserId = new Guid("22222222-2222-2222-2222-222222222222")
                         });
+                });
+
+            modelBuilder.Entity("VentionTask1.Domain.Entities.Session", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("IpAddress")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime>("LoggedInAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("LoggedOutAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("UserAgent")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId", "IsActive");
+
+                    b.ToTable("Sessions", (string)null);
                 });
 
             modelBuilder.Entity("VentionTask1.Domain.Entities.UploadedFile", b =>
@@ -218,9 +251,6 @@ namespace VentionTask1.Infrastructure.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
-                    b.Property<Guid?>("OrganizationId")
-                        .HasColumnType("uuid");
-
                     b.Property<string>("PasswordHash")
                         .IsRequired()
                         .HasMaxLength(255)
@@ -237,8 +267,6 @@ namespace VentionTask1.Infrastructure.Migrations
                     b.HasIndex("Email")
                         .IsUnique();
 
-                    b.HasIndex("OrganizationId", "Email");
-
                     b.ToTable("Users", (string)null);
 
                     b.HasData(
@@ -248,7 +276,6 @@ namespace VentionTask1.Infrastructure.Migrations
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Email = "admin@example.com",
                             Name = "Admin",
-                            OrganizationId = new Guid("11111111-1111-1111-1111-111111111111"),
                             PasswordHash = "Admin123!",
                             Role = 2
                         });
@@ -263,6 +290,25 @@ namespace VentionTask1.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("File");
+                });
+
+            modelBuilder.Entity("VentionTask1.Domain.Entities.OrganizationMember", b =>
+                {
+                    b.HasOne("VentionTask1.Domain.Entities.Organization", "Organization")
+                        .WithMany("Members")
+                        .HasForeignKey("OrganizationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("VentionTask1.Domain.Entities.User", "User")
+                        .WithMany("OrganizationMemberships")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Organization");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("VentionTask1.Domain.Entities.Session", b =>
@@ -293,26 +339,18 @@ namespace VentionTask1.Infrastructure.Migrations
                     b.Navigation("Owner");
                 });
 
-            modelBuilder.Entity("VentionTask1.Domain.Entities.User", b =>
-                {
-                    b.HasOne("VentionTask1.Domain.Entities.Organization", "Organization")
-                        .WithMany("Users")
-                        .HasForeignKey("OrganizationId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
-                    b.Navigation("Organization");
-                });
-
             modelBuilder.Entity("VentionTask1.Domain.Entities.Organization", b =>
                 {
                     b.Navigation("Files");
 
-                    b.Navigation("Users");
+                    b.Navigation("Members");
                 });
 
             modelBuilder.Entity("VentionTask1.Domain.Entities.User", b =>
                 {
                     b.Navigation("Files");
+
+                    b.Navigation("OrganizationMemberships");
 
                     b.Navigation("Sessions");
                 });

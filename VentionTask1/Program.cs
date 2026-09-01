@@ -36,5 +36,6 @@ app.MapControllers();
 app.MapGraphQL("/graphql");
 
 app.MapHub<FileProcessingHub>("/hubs/file-processing").RequireAuthorization();
+app.MapHub<PresenceHub>("/hubs/presence").RequireAuthorization();   
 
 app.Run();

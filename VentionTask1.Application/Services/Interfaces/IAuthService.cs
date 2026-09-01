@@ -5,5 +5,6 @@ namespace VentionTask1.Application.Services.Interfaces
     public interface IAuthService
     {
         Task<UserDTO> ValidateLoginAsync(LoginRequestDTO loginRequest, CancellationToken ct);
+        Task CreateSessionAsync(CreateSessionDTO createSessionDTO, CancellationToken ct);
     }
 }

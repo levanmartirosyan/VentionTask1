@@ -18,7 +18,8 @@ namespace VentionTask1.Infrastructure.Repositories.Implementation
         {
             var query = _dbContext.Users
                 .AsNoTracking()
-                .Include(user => user.Organization)
+                .Include(user => user.OrganizationMemberships)
+                .ThenInclude(member => member.Organization)
                 .OrderByDescending(user => user.CreatedAt)
                 .AsQueryable();
 
@@ -35,7 +36,8 @@ namespace VentionTask1.Infrastructure.Repositories.Implementation
         public async Task<User?> GetUserByIdAsync(Guid id, CancellationToken ct)
         {
             return await _dbContext.Users
-                .Include(user => user.Organization)
+                .Include(user => user.OrganizationMemberships)
+                .ThenInclude(member => member.Organization)
                 .FirstOrDefaultAsync(user => user.Id == id, ct);
         }
 
@@ -43,7 +45,8 @@ namespace VentionTask1.Infrastructure.Repositories.Implementation
         {
             return await _dbContext.Users
                 .AsNoTracking()
-                .Include(user => user.Organization)
+                .Include(user => user.OrganizationMemberships)
+                .ThenInclude(member => member.Organization)
                 .FirstOrDefaultAsync(user => user.Email == email, ct);
         }
 
