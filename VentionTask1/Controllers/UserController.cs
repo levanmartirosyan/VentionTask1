@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using VentionTask1.Application.DTOs;
 using VentionTask1.Application.Services.Interfaces;
 
 namespace VentionTask1.WebApi.Controllers
 {
+    [Authorize]
     [Route("api/users")]
     [ApiController]
     public class UserController : ControllerBase

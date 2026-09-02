@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using VentionTask1.Application.DTOs;
 using VentionTask1.Application.Services.Interfaces;
@@ -6,6 +6,7 @@ using VentionTask1.Domain.Constants;
 
 namespace VentionTask1.WebApi.Controllers
 {
+    [Authorize]
     [Route("api/files")]
     [ApiController]
     public class FilesController : ControllerBase

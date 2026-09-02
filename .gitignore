@@ -69,3 +69,6 @@ appsettings.*.local.json
 *.VisualState.xml
 TestResult.xml
 nunit-*.xml
+
+local.key
+local.crt

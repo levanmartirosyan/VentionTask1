@@ -1,0 +1,41 @@
+name: Backend CI
+
+on:
+  push:
+    branches:
+      - main
+      - task-*
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-test-docker:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Restore
+        run: dotnet restore VentionTask1.slnx
+
+      - name: Format check
+        run: dotnet format VentionTask1.slnx --verify-no-changes --verbosity diagnostic
+
+      - name: Build
+        run: dotnet build VentionTask1.slnx --configuration Release --no-restore
+
+      - name: Test
+        run: dotnet test VentionTask1.slnx --configuration Release --no-build --verbosity normal
+
+      - name: Build WebApi Docker image
+        run: docker build -t ventiontask1-api -f Dockerfile .
+
+      - name: Build ApiGateway Docker image
+        run: docker build -t ventiontask1-apigateway -f ApiGateway/Dockerfile .

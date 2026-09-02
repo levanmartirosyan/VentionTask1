@@ -24,6 +24,8 @@ app.UseSwaggerUI();
 app.UseMiddleware<CorrelationIdMiddleware>();
 app.UseMiddleware<GlobalExceptionHandlingMiddleware>();
 
+app.UseForwardedHeaders();
+
 app.UseHttpsRedirection();
 
 app.UseAuthentication();
