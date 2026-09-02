@@ -1,4 +1,4 @@
-﻿namespace VentionTask1.Application.DTOs
+namespace VentionTask1.Application.DTOs
 {
     public class FileDTO
     {

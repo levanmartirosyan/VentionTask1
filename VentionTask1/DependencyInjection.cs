@@ -1,12 +1,12 @@
+using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using FluentValidation;
 using MassTransit;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using System.Text;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using VentionTask1.Application.Consumers;
 using VentionTask1.Application.Services.Interfaces;
 using VentionTask1.Settings;

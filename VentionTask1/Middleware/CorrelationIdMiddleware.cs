@@ -1,4 +1,4 @@
-﻿namespace VentionTask1.WebApi.Middleware
+namespace VentionTask1.WebApi.Middleware
 {
     public class CorrelationIdMiddleware
     {

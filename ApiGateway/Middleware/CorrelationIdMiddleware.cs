@@ -1,4 +1,4 @@
-﻿namespace ApiGateway.Middleware
+namespace ApiGateway.Middleware
 {
     public class CorrelationIdMiddleware
     {

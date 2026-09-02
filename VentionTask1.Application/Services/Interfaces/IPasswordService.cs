@@ -1,4 +1,4 @@
-﻿using VentionTask1.Domain.Entities;
+using VentionTask1.Domain.Entities;
 
 namespace VentionTask1.Application.Services.Interfaces
 {

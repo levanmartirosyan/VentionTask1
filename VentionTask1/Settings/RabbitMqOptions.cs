@@ -1,4 +1,4 @@
-﻿namespace VentionTask1.WebApi.Settings
+namespace VentionTask1.WebApi.Settings
 {
     public class RabbitMqOptions
     {

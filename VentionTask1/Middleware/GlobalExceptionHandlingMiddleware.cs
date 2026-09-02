@@ -1,4 +1,4 @@
-﻿using FluentValidation;
+using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using VentionTask1.Application.Exceptions;
 using VentionTask1.WebApi.Extensions;

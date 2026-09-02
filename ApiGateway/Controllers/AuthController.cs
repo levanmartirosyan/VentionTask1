@@ -1,9 +1,9 @@
-﻿using ApiGateway.DTOs;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using ApiGateway.DTOs;
 using ApiGateway.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using VentionTask1.Application.DTOs;
 
 namespace ApiGateway.Controllers

@@ -1,7 +1,7 @@
+using System.Security.Cryptography;
 using FluentValidation;
 using MassTransit;
 using Microsoft.AspNetCore.Http;
-using System.Security.Cryptography;
 using VentionTask1.Application.DTOs;
 using VentionTask1.Application.Exceptions;
 using VentionTask1.Application.Extensions;
@@ -52,8 +52,8 @@ namespace VentionTask1.Application.Services.Implementation
             {
                 Items = items,
                 HasNextPage = hasNextPage,
-                NextCursor = hasNextPage && items.Any() 
-                ? items.Last().Id 
+                NextCursor = hasNextPage && items.Any()
+                ? items.Last().Id
                 : null
             };
         }

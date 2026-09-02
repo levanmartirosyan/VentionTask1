@@ -1,4 +1,4 @@
-﻿namespace VentionTask1.Domain.Constants
+namespace VentionTask1.Domain.Constants
 {
     public static class FileUploadConstants
     {

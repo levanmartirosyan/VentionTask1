@@ -1,4 +1,4 @@
-﻿using VentionTask1.Application.DTOs;
+using VentionTask1.Application.DTOs;
 using VentionTask1.Domain.Entities;
 
 namespace VentionTask1.Application.Extensions

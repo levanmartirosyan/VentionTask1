@@ -1,4 +1,4 @@
-﻿using FluentValidation;
+using FluentValidation;
 using VentionTask1.Application.DTOs;
 using VentionTask1.Application.Extensions;
 using VentionTask1.Application.Repositories.Interfaces;
@@ -13,8 +13,8 @@ namespace VentionTask1.Application.Services.Implementation
         private readonly IValidator<UpdateOrganizationDTO> _updateOrganizationValidator;
 
         public OrganizationService(
-            IOrganizationRepository organizationRepository, 
-            IValidator<CreateOrganizationDTO> createOrganizationValidator, 
+            IOrganizationRepository organizationRepository,
+            IValidator<CreateOrganizationDTO> createOrganizationValidator,
             IValidator<UpdateOrganizationDTO> updateOrganizationValidator
             )
         {

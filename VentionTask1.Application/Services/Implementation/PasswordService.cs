@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity;
 using VentionTask1.Application.Services.Interfaces;
 using VentionTask1.Domain.Entities;
 

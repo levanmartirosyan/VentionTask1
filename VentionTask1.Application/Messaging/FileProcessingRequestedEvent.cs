@@ -1,4 +1,4 @@
-﻿namespace VentionTask1.Application.Messaging
+namespace VentionTask1.Application.Messaging
 {
     public record FileProcessingRequestedEvent(
         Guid FileId,

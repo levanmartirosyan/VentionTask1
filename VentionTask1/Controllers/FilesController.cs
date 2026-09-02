@@ -21,7 +21,7 @@ namespace VentionTask1.WebApi.Controllers
         [HttpGet]
         public async Task<ActionResult<PaginatedResponseDTO<FileDTO>>> GetFilesAsync([FromQuery] Guid? cursor, [FromQuery] int pageSize = 10, [FromHeader(Name = "x-org-id")] Guid? organizationId = null, CancellationToken ct = default)
         {
-            var files= await _fileService.GetFilesPaginatedAsync(organizationId, cursor, pageSize, ct);
+            var files = await _fileService.GetFilesPaginatedAsync(organizationId, cursor, pageSize, ct);
 
             return Ok(files);
         }

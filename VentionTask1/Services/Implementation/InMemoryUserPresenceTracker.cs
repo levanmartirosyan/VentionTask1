@@ -1,4 +1,4 @@
-﻿using VentionTask1.Application.Services.Interfaces;
+using VentionTask1.Application.Services.Interfaces;
 
 namespace VentionTask1.WebApi.Services.Implementation
 {

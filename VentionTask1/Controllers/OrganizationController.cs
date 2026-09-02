@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using VentionTask1.Application.DTOs;
 using VentionTask1.Application.DTOs.Membership;

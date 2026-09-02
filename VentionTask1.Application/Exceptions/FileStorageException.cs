@@ -1,4 +1,4 @@
-﻿namespace VentionTask1.Application.Exceptions
+namespace VentionTask1.Application.Exceptions
 {
     public class FileStorageException : Exception
     {
