@@ -1,4 +1,4 @@
-﻿using VentionTask1.Application.DTOs;
+using VentionTask1.Application.DTOs;
 using VentionTask1.Application.Services.Interfaces;
 
 namespace VentionTask1.WebApi.GraphQL.Mutations

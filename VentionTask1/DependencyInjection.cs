@@ -1,11 +1,12 @@
-using FluentValidation;
-using MassTransit;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using FluentValidation;
+using MassTransit;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using VentionTask1.Application.Consumers;
 using VentionTask1.Application.Services.Interfaces;
 using VentionTask1.Settings;
@@ -175,6 +176,13 @@ namespace VentionTask1
                         []
                     }
                 });
+            });
+
+            services.Configure<ForwardedHeadersOptions>(options =>
+            {
+                options.ForwardedHeaders =
+                    ForwardedHeaders.XForwardedFor |
+                    ForwardedHeaders.XForwardedProto;
             });
 
             services.Configure<ApplicationSettings>(

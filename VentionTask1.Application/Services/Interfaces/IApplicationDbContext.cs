@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using VentionTask1.Domain.Entities;
 
 namespace VentionTask1.Application.Services.Interfaces

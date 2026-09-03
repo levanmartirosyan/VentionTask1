@@ -1,4 +1,4 @@
-﻿using FluentValidation;
+using FluentValidation;
 using VentionTask1.Application.DTOs.Membership;
 
 namespace VentionTask1.Application.Validators.Membership

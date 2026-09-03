@@ -1,4 +1,4 @@
-﻿using FluentValidation;
+using FluentValidation;
 using Microsoft.AspNetCore.Http;
 using VentionTask1.Application.DTOs;
 using VentionTask1.Domain.Constants;

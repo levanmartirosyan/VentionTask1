@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using VentionTask1.Application.DTOs;
 using VentionTask1.Application.Services.Interfaces;
@@ -6,6 +6,7 @@ using VentionTask1.Domain.Constants;
 
 namespace VentionTask1.WebApi.Controllers
 {
+    [Authorize]
     [Route("api/files")]
     [ApiController]
     public class FilesController : ControllerBase
@@ -20,7 +21,7 @@ namespace VentionTask1.WebApi.Controllers
         [HttpGet]
         public async Task<ActionResult<PaginatedResponseDTO<FileDTO>>> GetFilesAsync([FromQuery] Guid? cursor, [FromQuery] int pageSize = 10, [FromHeader(Name = "x-org-id")] Guid? organizationId = null, CancellationToken ct = default)
         {
-            var files= await _fileService.GetFilesPaginatedAsync(organizationId, cursor, pageSize, ct);
+            var files = await _fileService.GetFilesPaginatedAsync(organizationId, cursor, pageSize, ct);
 
             return Ok(files);
         }

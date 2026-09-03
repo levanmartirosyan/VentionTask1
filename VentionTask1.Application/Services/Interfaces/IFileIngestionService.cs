@@ -1,4 +1,4 @@
-﻿namespace VentionTask1.Application.Services.Interfaces
+namespace VentionTask1.Application.Services.Interfaces
 {
     public interface IFileIngestionService
     {

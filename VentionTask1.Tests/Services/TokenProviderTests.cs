@@ -1,7 +1,7 @@
+using System.Security.Claims;
 using ApiGateway.Services.Implementation;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.JsonWebTokens;
-using System.Security.Claims;
 using VentionTask1.Application.DTOs;
 using VentionTask1.Domain.Constants;
 

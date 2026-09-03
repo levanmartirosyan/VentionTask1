@@ -1,4 +1,4 @@
-﻿using FluentValidation;
+using FluentValidation;
 
 namespace VentionTask1.WebApi.Extensions
 {

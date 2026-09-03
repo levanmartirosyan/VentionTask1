@@ -18,7 +18,7 @@ namespace VentionTask1.Application.Services.Implementation
 
         public UserService(
             IUserRepository usersRepository,
-            IValidator<CreateUserDTO> createUserValidator, 
+            IValidator<CreateUserDTO> createUserValidator,
             IValidator<UpdateUserDTO> updateUserValidator,
             IPasswordService passwordService,
             IOrganizationRepository organizationRepository

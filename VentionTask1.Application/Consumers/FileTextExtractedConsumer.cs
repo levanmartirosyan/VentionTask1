@@ -1,4 +1,4 @@
-﻿using MassTransit;
+using MassTransit;
 using VentionTask1.Application.Messaging;
 using VentionTask1.Application.Repositories.Interfaces;
 using VentionTask1.Application.Services.Interfaces;

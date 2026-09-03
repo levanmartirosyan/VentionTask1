@@ -1,4 +1,4 @@
-﻿namespace ApiGateway.DTOs
+namespace ApiGateway.DTOs
 {
     public class LoginResponseDTO
     {

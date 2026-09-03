@@ -24,6 +24,8 @@ app.UseSwaggerUI();
 app.UseMiddleware<CorrelationIdMiddleware>();
 app.UseMiddleware<GlobalExceptionHandlingMiddleware>();
 
+app.UseForwardedHeaders();
+
 app.UseHttpsRedirection();
 
 app.UseAuthentication();
@@ -36,6 +38,6 @@ app.MapControllers();
 app.MapGraphQL("/graphql");
 
 app.MapHub<FileProcessingHub>("/hubs/file-processing").RequireAuthorization();
-app.MapHub<PresenceHub>("/hubs/presence").RequireAuthorization();   
+app.MapHub<PresenceHub>("/hubs/presence").RequireAuthorization();
 
 app.Run();

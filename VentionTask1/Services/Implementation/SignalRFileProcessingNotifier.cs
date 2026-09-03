@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.SignalR;
+using Microsoft.AspNetCore.SignalR;
 using VentionTask1.Application.Services.Interfaces;
 using VentionTask1.WebApi.Hubs;
 

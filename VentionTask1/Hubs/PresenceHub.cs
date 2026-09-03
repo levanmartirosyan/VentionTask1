@@ -1,5 +1,5 @@
-﻿using Microsoft.AspNetCore.SignalR;
 using System.Security.Claims;
+using Microsoft.AspNetCore.SignalR;
 using VentionTask1.Application.Services.Interfaces;
 
 namespace VentionTask1.WebApi.Hubs

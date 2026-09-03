@@ -1,4 +1,4 @@
-﻿namespace VentionTask1.Domain.Entities
+namespace VentionTask1.Domain.Entities
 {
     public class UploadedFile : BaseEntity
     {

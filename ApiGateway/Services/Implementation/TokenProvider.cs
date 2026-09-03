@@ -1,10 +1,10 @@
-﻿using Microsoft.AspNetCore.WebUtilities;
-using Microsoft.IdentityModel.JsonWebTokens;
-using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using ApiGateway.Services.Interfaces;
+using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.IdentityModel.JsonWebTokens;
+using Microsoft.IdentityModel.Tokens;
 using VentionTask1.Application.DTOs;
 
 namespace ApiGateway.Services.Implementation

@@ -1,4 +1,4 @@
-﻿using FluentValidation;
+using FluentValidation;
 using VentionTask1.Application.DTOs.Membership;
 using VentionTask1.Domain.Constants;
 

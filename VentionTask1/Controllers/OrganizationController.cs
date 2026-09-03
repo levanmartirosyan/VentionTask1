@@ -1,15 +1,12 @@
-﻿using FluentValidation;
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using VentionTask1.Application.DTOs;
 using VentionTask1.Application.DTOs.Membership;
-using VentionTask1.Application.Services.Implementation;
 using VentionTask1.Application.Services.Interfaces;
-using VentionTask1.Domain.Entities;
-using VentionTask1.WebApi.Extensions;
 
 namespace VentionTask1.WebApi.Controllers
 {
+    [Authorize]
     [Route("api/organizations")]
     [ApiController]
     public class OrganizationController : ControllerBase
