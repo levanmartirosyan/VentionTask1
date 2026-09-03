@@ -24,17 +24,9 @@ namespace VentionTask1.Infrastructure.Data.Configurations
             builder.HasIndex(u => u.Email)
                    .IsUnique();
 
-            builder.HasIndex(u => new { u.OrganizationId, u.Email });
-
             builder.Property(u => u.PasswordHash)
                    .IsRequired()
                    .HasMaxLength(255);
-
-            builder.HasOne(u => u.Organization)
-                   .WithMany(o => o.Users)
-                   .HasForeignKey(u => u.OrganizationId)
-                   .IsRequired(false)
-                   .OnDelete(DeleteBehavior.SetNull);
 
             builder.HasData(new User
             {
@@ -43,7 +35,6 @@ namespace VentionTask1.Infrastructure.Data.Configurations
                 Email = "admin@example.com",
                 PasswordHash = "Admin123!",
                 Role = RoleType.OWNER,
-                OrganizationId = Guid.Parse("11111111-1111-1111-1111-111111111111"),
                 CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc)
             });
         }

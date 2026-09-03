@@ -29,6 +29,8 @@ namespace VentionTask1.Infrastructure
             services.AddScoped<IOrganizationRepository, OrganizationRepository>();
             services.AddScoped<IFileRepository, FileRepository>();
             services.AddScoped<IFileChunkRepository, FileChunkRepository>();
+            services.AddScoped<ISessionRepository, SessionRepository>();
+            services.AddScoped<IOrganizationMemberRepository, OrganizationMemberRepository>();
 
             return services;
         }

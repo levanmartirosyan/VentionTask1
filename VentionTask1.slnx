@@ -3,6 +3,8 @@
     <File Path="Dockerfile" />
     <File Path="file-upload-process-delete-test.js" />
     <File Path="files-list-test.js" />
+    <File Path="nginx.conf" />
+    <File Path="websocket-load-test.js" />
   </Folder>
   <Project Path="ApiGateway/ApiGateway.csproj" Id="95ca7e4c-d068-4ef3-b32c-3ac2f4978128" />
   <Project Path="VentionTask1.Application/VentionTask1.Application.csproj" />

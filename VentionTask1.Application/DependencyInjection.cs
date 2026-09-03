@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using VentionTask1.Application.Services.Implementation;
 using VentionTask1.Application.Services.Interfaces;
 using VentionTask1.Application.Validators.File;
+using VentionTask1.Application.Validators.Membership;
 using VentionTask1.Application.Validators.Organization;
 using VentionTask1.Application.Validators.User;
 using VentionTask1.Domain.Entities;
@@ -21,12 +22,15 @@ namespace VentionTask1.Application
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IFileUploadService, FileUploadService>();
             services.AddScoped<IFileIngestionService, FileIngestionService>();
+            services.AddScoped<IOrganizationMemberService, OrganizationMemberService>();
 
             services.AddValidatorsFromAssemblyContaining<CreateUserDTOValidator>();
             services.AddValidatorsFromAssemblyContaining<UpdateUserDTOValidator>();
             services.AddValidatorsFromAssemblyContaining<CreateOrganizationDTOValidator>();
             services.AddValidatorsFromAssemblyContaining<UpdateOrganizationDTOValidator>();
             services.AddValidatorsFromAssemblyContaining<UploadFileDTOValidator>();
+            services.AddValidatorsFromAssemblyContaining<AddOrganizationMemberDTOValidator>();
+            services.AddValidatorsFromAssemblyContaining<UpdateOrganizationMemberRoleDTOValidator>();
 
             return services;
         }

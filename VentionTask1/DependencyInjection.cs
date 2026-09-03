@@ -116,7 +116,7 @@ namespace VentionTask1
                             var path = context.HttpContext.Request.Path;
 
                             if (!string.IsNullOrWhiteSpace(accessToken) &&
-                                path.StartsWithSegments("/hubs/file-processing"))
+                                path.StartsWithSegments("/hubs"))
                             {
                                 context.Token = accessToken;
                             }
@@ -135,6 +135,7 @@ namespace VentionTask1
                 options.KeepAliveInterval = TimeSpan.FromSeconds(15);
                 options.ClientTimeoutInterval = TimeSpan.FromSeconds(30);
                 options.HandshakeTimeout = TimeSpan.FromSeconds(15);
+                options.MaximumReceiveMessageSize = 32 * 1024;
             });
 
             services
@@ -182,6 +183,7 @@ namespace VentionTask1
                 builder.Configuration.GetSection("RabbitMQ"));
 
             services.AddScoped<IFileProcessingNotifier, FileProcessingSignalRNotifier>();
+            services.AddSingleton<IUserPresenceTracker, InMemoryUserPresenceTracker>();
 
             return builder;
         }

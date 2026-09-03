@@ -56,6 +56,21 @@ namespace ApiGateway.Controllers
 
             var (accessToken, _) = _tokenProvider.CreateAccessToken(user);
 
+            var createSessionResponse = await client.PostAsJsonAsync(
+                "api/auth/sessions",
+                new CreateSessionDTO
+                {
+                    UserId = user.Id,
+                    IpAddress = HttpContext.Connection.RemoteIpAddress?.ToString(),
+                    UserAgent = Request.Headers.UserAgent.ToString()
+                },
+                ct);
+
+            if (!createSessionResponse.IsSuccessStatusCode)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+
             return Ok(new LoginResponseDTO
             {
                 Id = user.Id,

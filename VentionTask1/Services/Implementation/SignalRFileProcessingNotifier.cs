@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 using VentionTask1.Application.Services.Interfaces;
-using VentionTask1.Domain.Entities;
 using VentionTask1.WebApi.Hubs;
 
 namespace VentionTask1.WebApi.Services.Implementation
@@ -39,18 +38,14 @@ namespace VentionTask1.WebApi.Services.Implementation
             return SendUpdateAsync(fileId, organizationId, "failed", error, ct);
         }
 
-        private Task SendUpdateAsync(
-            Guid fileId,
-            Guid? organizationId,
-            string status,
-            string? error,
-            CancellationToken ct)
+        private Task SendUpdateAsync(Guid fileId, Guid? organizationId, string status, string? error, CancellationToken ct)
         {
             return _hubContext.Clients
-                .Group($"org-{organizationId}-files")
+                .Group($"file-{fileId}")
                 .SendAsync("FileProcessingUpdate", new
                 {
                     fileId,
+                    organizationId,
                     status,
                     error
                 }, ct);

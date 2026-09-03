@@ -23,5 +23,13 @@ namespace VentionTask1.WebApi.Controllers
 
             return Ok(user);
         }
+
+        [HttpPost("sessions")]
+        public async Task<IActionResult> CreateSession(CreateSessionDTO createSessionDTO, CancellationToken ct)
+        {
+            await _authService.CreateSessionAsync(createSessionDTO, ct);
+
+            return NoContent();
+        }
     }
 }

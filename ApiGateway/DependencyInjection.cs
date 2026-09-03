@@ -16,7 +16,9 @@ namespace ApiGateway
             {
                 options.AddPolicy("Frontend", policy =>
                 {
-                    policy.WithOrigins("http://localhost:3000")
+                    policy.WithOrigins(
+                            "http://localhost:3000",
+                            "http://127.0.0.1:5500")
                         .AllowAnyHeader()
                         .AllowAnyMethod()
                         .AllowCredentials();

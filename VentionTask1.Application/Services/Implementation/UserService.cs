@@ -148,18 +148,6 @@ namespace VentionTask1.Application.Services.Implementation
                 user.PasswordHash = _passwordService.HashPassword(user, userDTO.NewPassword);
             }
 
-            if (userDTO.OrganizationId.HasValue)
-            {
-                var organization = await _organizationRepository.GetOrganizationByIdAsync(userDTO.OrganizationId.Value, ct);
-
-                if (organization == null)
-                {
-                    throw new KeyNotFoundException($"Organization with ID '{userDTO.OrganizationId.Value}' not found.");
-                }
-
-                user.OrganizationId = userDTO.OrganizationId.Value;
-            }
-
             await _usersRepository.UpdateUserAsync(user);
 
             if (!await _usersRepository.SaveChangesAsync(ct))

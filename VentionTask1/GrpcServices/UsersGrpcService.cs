@@ -27,13 +27,15 @@ namespace VentionTask1.WebApi.GrpcServices
                 throw new RpcException(new Status(StatusCode.NotFound, "User not found."));
             }
 
+            var mainOrganization = user.Organisations.FirstOrDefault();
+
             return new UserGrpcResponse
             {
                 Id = user.Id.ToString(),
                 Name = user.Name,
                 Email = user.Email,
-                OrganizationId = user.OrganizationId.ToString(),
-                OrganizationName = user.OrganizationName ?? string.Empty
+                OrganizationId = mainOrganization?.Id.ToString() ?? string.Empty,
+                OrganizationName = mainOrganization?.Name ?? string.Empty
             };
         }
     }

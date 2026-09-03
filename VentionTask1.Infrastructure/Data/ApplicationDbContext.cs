@@ -12,6 +12,7 @@ namespace VentionTask1.Infrastructure.Data
         public DbSet<Session> Sessions { get; set; }
         public DbSet<UploadedFile> Files { get; set; }
         public DbSet<FileChunk> FileChunks { get; set; }
+        public DbSet<OrganizationMember> OrganizationMembers { get; set; }
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
