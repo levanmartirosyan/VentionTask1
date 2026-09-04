@@ -1,4 +1,5 @@
 using MassTransit;
+using Microsoft.Extensions.Logging;
 using VentionTask1.Application.Messaging;
 using VentionTask1.Application.Repositories.Interfaces;
 using VentionTask1.Application.Services.Interfaces;
@@ -11,15 +12,18 @@ namespace VentionTask1.Application.Consumers
         private readonly IFileRepository _fileRepository;
         private readonly IPublishEndpoint _publishEndpoint;
         private readonly IFileProcessingNotifier _notifier;
+        private readonly ILogger<FileProcessingRequestedConsumer> _logger;
 
         public FileProcessingRequestedConsumer(
             IFileRepository fileRepository,
             IPublishEndpoint publishEndpoint,
-            IFileProcessingNotifier notifier)
+            IFileProcessingNotifier notifier,
+            ILogger<FileProcessingRequestedConsumer> logger)
         {
             _fileRepository = fileRepository;
             _publishEndpoint = publishEndpoint;
             _notifier = notifier;
+            _logger = logger;
         }
 
         public async Task Consume(ConsumeContext<FileProcessingRequestedEvent> context)
@@ -41,6 +45,8 @@ namespace VentionTask1.Application.Consumers
 
             try
             {
+                _logger.LogInformation("File processing started for file {FileId}", message.FileId);
+
                 file.Status = "processing";
                 file.ProcessingError = null;
 
@@ -49,15 +55,14 @@ namespace VentionTask1.Application.Consumers
                 await _notifier.NotifyProcessingStartedAsync(file.Id, file.OrganizationId, ct);
 
                 await _publishEndpoint.Publish(
-                    new FileTextExtractedEvent(message.FileId),
+                    new FileTextExtractionRequestedEvent(message.FileId),
                     ct);
             }
             catch (Exception ex)
             {
-                file.Status = "failed";
-                file.ProcessingError = ex.Message;
+                _logger.LogError(ex, "File processing request failed for file {FileId}", message.FileId);
 
-                await _fileRepository.SaveChangesAsync(ct);
+                await _fileRepository.MarkFailedAsync(message.FileId, ex.Message, ct);
 
                 await _notifier.NotifyFailedAsync(message.FileId, file.OrganizationId, ex.Message, ct);
 

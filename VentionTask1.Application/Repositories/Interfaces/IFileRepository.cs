@@ -8,6 +8,7 @@ namespace VentionTask1.Application.Repositories.Interfaces
         Task<UploadedFile?> GetByIdAsync(Guid id, CancellationToken ct);
         Task<UploadedFile> AddAsync(UploadedFile file, CancellationToken ct);
         Task DeleteAsync(UploadedFile file);
+        Task MarkFailedAsync(Guid fileId, string error, CancellationToken ct);
         Task<bool> SaveChangesAsync(CancellationToken ct);
     }
 }

@@ -6,12 +6,12 @@ namespace VentionTask1.Application.Messaging
         string StorageKey,
         string ContentType);
 
-    public record FileTextExtractedEvent(
+    public record FileTextExtractionRequestedEvent(
         Guid FileId);
 
-    public record FileChunkingCompletedEvent(
+    public record FileChunkingRequestedEvent(
         Guid FileId);
 
-    public record FileProcessingCompletedEvent(
+    public record FileProcessingCompletionRequestedEvent(
         Guid FileId);
 }

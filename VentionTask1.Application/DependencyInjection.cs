@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using VentionTask1.Application.Services.Implementation;
 using VentionTask1.Application.Services.Interfaces;
+using VentionTask1.Application.Validators.Chat;
 using VentionTask1.Application.Validators.File;
 using VentionTask1.Application.Validators.Membership;
 using VentionTask1.Application.Validators.Organization;
@@ -23,6 +24,8 @@ namespace VentionTask1.Application
             services.AddScoped<IFileUploadService, FileUploadService>();
             services.AddScoped<IFileIngestionService, FileIngestionService>();
             services.AddScoped<IOrganizationMemberService, OrganizationMemberService>();
+            services.AddScoped<IOrganizationPermissionService, OrganizationPermissionService>();
+            services.AddScoped<IChatService, ChatService>();
 
             services.AddValidatorsFromAssemblyContaining<CreateUserDTOValidator>();
             services.AddValidatorsFromAssemblyContaining<UpdateUserDTOValidator>();
@@ -31,6 +34,8 @@ namespace VentionTask1.Application
             services.AddValidatorsFromAssemblyContaining<UploadFileDTOValidator>();
             services.AddValidatorsFromAssemblyContaining<AddOrganizationMemberDTOValidator>();
             services.AddValidatorsFromAssemblyContaining<UpdateOrganizationMemberRoleDTOValidator>();
+            services.AddValidatorsFromAssemblyContaining<CreateChatSessionDTOValidator>();
+            services.AddValidatorsFromAssemblyContaining<SendChatMessageDTOValidator>();
 
             return services;
         }

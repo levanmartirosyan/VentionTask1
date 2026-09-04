@@ -1,6 +1,8 @@
+using System.Security.Claims;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Threading.RateLimiting;
 using FluentValidation;
 using MassTransit;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -10,7 +12,6 @@ using Microsoft.OpenApi.Models;
 using VentionTask1.Application.Consumers;
 using VentionTask1.Application.Services.Interfaces;
 using VentionTask1.Settings;
-using VentionTask1.WebApi.GraphQL;
 using VentionTask1.WebApi.GraphQL.Mutations;
 using VentionTask1.WebApi.GraphQL.Queries;
 using VentionTask1.WebApi.GraphQL.Types;
@@ -43,9 +44,9 @@ namespace VentionTask1
                     .Get<RabbitMqOptions>() ?? new RabbitMqOptions();
 
                 x.AddConsumer<FileProcessingRequestedConsumer>();
-                x.AddConsumer<FileTextExtractedConsumer>();
-                x.AddConsumer<FileChunkingCompletedConsumer>();
-                x.AddConsumer<FileProcessingCompletedConsumer>();
+                x.AddConsumer<FileTextExtractionRequestedConsumer>();
+                x.AddConsumer<FileChunkingRequestedConsumer>();
+                x.AddConsumer<FileProcessingCompletionRequestedConsumer>();
 
                 x.AddConfigureEndpointsCallback((_, endpointConfigurator) =>
                 {
@@ -192,6 +193,27 @@ namespace VentionTask1
 
             services.AddScoped<IFileProcessingNotifier, FileProcessingSignalRNotifier>();
             services.AddSingleton<IUserPresenceTracker, InMemoryUserPresenceTracker>();
+
+            services.AddRateLimiter(options =>
+            {
+                options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+
+                options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(context =>
+                {
+                    var key = context.User.FindFirstValue(ClaimTypes.NameIdentifier)
+                        ?? context.Connection.RemoteIpAddress?.ToString()
+                        ?? "anonymous";
+
+                    return RateLimitPartition.GetFixedWindowLimiter(key, _ =>
+                        new FixedWindowRateLimiterOptions
+                        {
+                            PermitLimit = 100,
+                            Window = TimeSpan.FromMinutes(1),
+                            QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+                            QueueLimit = 0
+                        });
+                });
+            });
 
             return builder;
         }

@@ -24,6 +24,7 @@ namespace VentionTask1.Tests.Services
             Assert.Contains("DocuChat.Client", jwt.Audiences);
             Assert.Contains(jwt.Claims, claim => claim.Type == ClaimTypes.NameIdentifier && claim.Value == user.Id.ToString());
             Assert.Contains(jwt.Claims, claim => claim.Type == JwtRegisteredClaimNames.Email && claim.Value == user.Email);
+            Assert.Contains(jwt.Claims, claim => claim.Type == ClaimTypes.Role && claim.Value == user.Role.ToString());
             Assert.Contains(jwt.Claims, claim => claim.Type == JwtRegisteredClaimNames.Jti);
         }
 

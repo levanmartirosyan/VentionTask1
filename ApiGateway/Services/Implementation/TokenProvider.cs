@@ -32,6 +32,7 @@ namespace ApiGateway.Services.Implementation
         {
             new(ClaimTypes.NameIdentifier, userDTO.Id.ToString()),
             new(JwtRegisteredClaimNames.Email, userDTO.Email),
+            new(ClaimTypes.Role, userDTO.Role.ToString()),
             new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
         };
 

@@ -1,4 +1,5 @@
 using MassTransit;
+using Microsoft.Extensions.Logging;
 using Moq;
 using VentionTask1.Application.Consumers;
 using VentionTask1.Application.Messaging;
@@ -12,23 +13,26 @@ namespace VentionTask1.Tests.Consumers
     {
         private readonly Mock<IFileRepository> _fileRepositoryMock;
         private readonly Mock<IFileProcessingNotifier> _notifierMock;
-        private readonly FileProcessingCompletedConsumer _consumer;
+        private readonly Mock<ILogger<FileProcessingCompletionRequestedConsumer>> _loggerMock;
+        private readonly FileProcessingCompletionRequestedConsumer _consumer;
 
         public FileProcessingCompletedConsumerTests()
         {
             _fileRepositoryMock = new Mock<IFileRepository>();
             _notifierMock = new Mock<IFileProcessingNotifier>();
+            _loggerMock = new Mock<ILogger<FileProcessingCompletionRequestedConsumer>>();
 
-            _consumer = new FileProcessingCompletedConsumer(
+            _consumer = new FileProcessingCompletionRequestedConsumer(
                 _fileRepositoryMock.Object,
-                _notifierMock.Object);
+                _notifierMock.Object,
+                _loggerMock.Object);
         }
 
         [Fact]
         public async Task Consume_WhenFileExists_ShouldMarkProcessedAndNotifyCompleted()
         {
             var file = CreateFile("processing");
-            var message = new FileProcessingCompletedEvent(file.Id);
+            var message = new FileProcessingCompletionRequestedEvent(file.Id);
             var context = CreateContext(message);
 
             _fileRepositoryMock
@@ -53,7 +57,7 @@ namespace VentionTask1.Tests.Consumers
         public async Task Consume_WhenFileAlreadyProcessed_ShouldNotSaveOrNotify()
         {
             var file = CreateFile("processed");
-            var message = new FileProcessingCompletedEvent(file.Id);
+            var message = new FileProcessingCompletionRequestedEvent(file.Id);
             var context = CreateContext(message);
 
             _fileRepositoryMock
@@ -72,7 +76,7 @@ namespace VentionTask1.Tests.Consumers
         public async Task Consume_WhenSaveFails_ShouldMarkFailedNotifyAndRethrow()
         {
             var file = CreateFile("processing");
-            var message = new FileProcessingCompletedEvent(file.Id);
+            var message = new FileProcessingCompletionRequestedEvent(file.Id);
             var context = CreateContext(message);
             var exception = new InvalidOperationException("Save failed.");
 
@@ -88,17 +92,18 @@ namespace VentionTask1.Tests.Consumers
             await Assert.ThrowsAsync<InvalidOperationException>(() =>
                 _consumer.Consume(context));
 
-            Assert.Equal("failed", file.Status);
-            Assert.Equal(exception.Message, file.ProcessingError);
+            _fileRepositoryMock.Verify(
+                repository => repository.MarkFailedAsync(file.Id, exception.Message, CancellationToken.None),
+                Times.Once);
 
             _notifierMock.Verify(
                 notifier => notifier.NotifyFailedAsync(file.Id, file.OrganizationId, exception.Message, CancellationToken.None),
                 Times.Once);
         }
 
-        private static ConsumeContext<FileProcessingCompletedEvent> CreateContext(FileProcessingCompletedEvent message)
+        private static ConsumeContext<FileProcessingCompletionRequestedEvent> CreateContext(FileProcessingCompletionRequestedEvent message)
         {
-            var contextMock = new Mock<ConsumeContext<FileProcessingCompletedEvent>>();
+            var contextMock = new Mock<ConsumeContext<FileProcessingCompletionRequestedEvent>>();
 
             contextMock
                 .SetupGet(context => context.Message)

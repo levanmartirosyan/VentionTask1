@@ -1,23 +1,26 @@
 using MassTransit;
+using Microsoft.Extensions.Logging;
 using VentionTask1.Application.Messaging;
 using VentionTask1.Application.Repositories.Interfaces;
 using VentionTask1.Application.Services.Interfaces;
 
 namespace VentionTask1.Application.Consumers
 {
-    public class FileProcessingCompletedConsumer
-        : IConsumer<FileProcessingCompletedEvent>
+    public class FileProcessingCompletionRequestedConsumer
+        : IConsumer<FileProcessingCompletionRequestedEvent>
     {
         private readonly IFileRepository _fileRepository;
         private readonly IFileProcessingNotifier _notifier;
+        private readonly ILogger<FileProcessingCompletionRequestedConsumer> _logger;
 
-        public FileProcessingCompletedConsumer(IFileRepository fileRepository, IFileProcessingNotifier notifier)
+        public FileProcessingCompletionRequestedConsumer(IFileRepository fileRepository, IFileProcessingNotifier notifier, ILogger<FileProcessingCompletionRequestedConsumer> logger)
         {
             _fileRepository = fileRepository;
             _notifier = notifier;
+            _logger = logger;
         }
 
-        public async Task Consume(ConsumeContext<FileProcessingCompletedEvent> context)
+        public async Task Consume(ConsumeContext<FileProcessingCompletionRequestedEvent> context)
         {
             var message = context.Message;
             var ct = context.CancellationToken;
@@ -36,6 +39,8 @@ namespace VentionTask1.Application.Consumers
 
             try
             {
+                _logger.LogInformation("File processing completion started for file {FileId}", message.FileId);
+
                 file.Status = "processed";
                 file.ProcessingError = null;
 
@@ -43,15 +48,16 @@ namespace VentionTask1.Application.Consumers
             }
             catch (Exception ex)
             {
-                file.Status = "failed";
-                file.ProcessingError = ex.Message;
+                _logger.LogError(ex, "File processing completion failed for file {FileId}", message.FileId);
 
-                await _fileRepository.SaveChangesAsync(ct);
+                await _fileRepository.MarkFailedAsync(message.FileId, ex.Message, ct);
 
                 await _notifier.NotifyFailedAsync(message.FileId, file.OrganizationId, ex.Message, ct);
 
                 throw;
             }
+
+            _logger.LogInformation("File processing completed for file {FileId}", message.FileId);
 
             await _notifier.NotifyCompletedAsync(message.FileId, file.OrganizationId, ct);
         }

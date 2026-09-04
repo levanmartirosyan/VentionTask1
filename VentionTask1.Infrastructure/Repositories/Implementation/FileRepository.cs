@@ -55,6 +55,17 @@ namespace VentionTask1.Infrastructure.Repositories.Implementation
             return Task.CompletedTask;
         }
 
+        public async Task MarkFailedAsync(Guid fileId, string error, CancellationToken ct)
+        {
+            await _dbContext.Files
+                .Where(file => file.Id == fileId)
+                .ExecuteUpdateAsync(setters => setters
+                    .SetProperty(file => file.Status, "failed")
+                    .SetProperty(file => file.ProcessingError, error)
+                    .SetProperty(file => file.UpdatedAt, DateTime.UtcNow),
+                    ct);
+        }
+
         public async Task<bool> SaveChangesAsync(CancellationToken ct)
         {
             return await _dbContext.SaveChangesAsync(ct) > 0;

@@ -1,6 +1,7 @@
 using FluentValidation;
 using MassTransit;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 using Moq;
 using VentionTask1.Application.DTOs;
 using VentionTask1.Application.Exceptions;
@@ -16,6 +17,7 @@ namespace VentionTask1.Tests.Services
         private readonly Mock<IValidator<UploadFileDTO>> _uploadValidatorMock;
         private readonly Mock<IPublishEndpoint> _publishEndpointMock;
         private readonly Mock<IHttpContextAccessor> _httpContextAccessorMock;
+        private readonly Mock<ILogger<FileUploadService>> _loggerMock;
         private readonly FileUploadService _service;
         private readonly List<string> _createdFiles = [];
 
@@ -25,6 +27,7 @@ namespace VentionTask1.Tests.Services
             _uploadValidatorMock = new Mock<IValidator<UploadFileDTO>>();
             _publishEndpointMock = new Mock<IPublishEndpoint>();
             _httpContextAccessorMock = new Mock<IHttpContextAccessor>();
+            _loggerMock = new Mock<ILogger<FileUploadService>>();
 
             _uploadValidatorMock
                 .Setup(validator => validator.ValidateAsync(It.IsAny<UploadFileDTO>(), It.IsAny<CancellationToken>()))
@@ -34,7 +37,8 @@ namespace VentionTask1.Tests.Services
                 _fileRepositoryMock.Object,
                 _uploadValidatorMock.Object,
                 _publishEndpointMock.Object,
-                _httpContextAccessorMock.Object);
+                _httpContextAccessorMock.Object,
+                _loggerMock.Object);
         }
 
         [Fact]
