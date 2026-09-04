@@ -1,4 +1,5 @@
 using System.Text;
+using UglyToad.PdfPig;
 using VentionTask1.Application.Repositories.Interfaces;
 using VentionTask1.Application.Services.Interfaces;
 using VentionTask1.Domain.Entities;
@@ -36,7 +37,7 @@ namespace VentionTask1.Application.Services.Implementation
                 throw new FileNotFoundException($"Physical file for ID '{fileId}' was not found.");
             }
 
-            var text = await ExtractTextAsync(file, fullPath, ct);
+            var text = SanitizeExtractedText(await ExtractTextAsync(file, fullPath, ct));
 
             await _fileChunkRepository.DeleteByFileIdAsync(fileId, ct);
 
@@ -66,6 +67,12 @@ namespace VentionTask1.Application.Services.Implementation
                 extension.Equals(".txt", StringComparison.OrdinalIgnoreCase))
             {
                 return await File.ReadAllTextAsync(fullPath, Encoding.UTF8, ct);
+            }
+
+            if (file.ContentType == "application/pdf" ||
+                extension.Equals(".pdf", StringComparison.OrdinalIgnoreCase))
+            {
+                return ExtractPdfText(fullPath);
             }
 
             throw new NotSupportedException($"Text extraction for '{file.ContentType}' is not implemented yet.");
@@ -103,6 +110,25 @@ namespace VentionTask1.Application.Services.Implementation
             }
 
             return fullPath;
+        }
+
+        private static string ExtractPdfText(string fullPath)
+        {
+            var text = new StringBuilder();
+
+            using var document = PdfDocument.Open(fullPath);
+
+            foreach (var page in document.GetPages())
+            {
+                text.AppendLine(page.Text);
+            }
+
+            return text.ToString();
+        }
+
+        private static string SanitizeExtractedText(string text)
+        {
+            return text.Replace("\0", string.Empty);
         }
     }
 }

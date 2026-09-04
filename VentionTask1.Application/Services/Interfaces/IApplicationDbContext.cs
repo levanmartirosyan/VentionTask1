@@ -11,6 +11,8 @@ namespace VentionTask1.Application.Services.Interfaces
         DbSet<UploadedFile> Files { get; set; }
         DbSet<FileChunk> FileChunks { get; set; }
         DbSet<OrganizationMember> OrganizationMembers { get; set; }
+        DbSet<ChatSession> ChatSessions { get; set; }
+        DbSet<ChatMessage> ChatMessages { get; set; }
 
         Task<int> SaveChangesAsync(CancellationToken ct);
     }

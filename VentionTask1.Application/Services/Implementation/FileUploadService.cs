@@ -2,6 +2,7 @@ using System.Security.Cryptography;
 using FluentValidation;
 using MassTransit;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 using VentionTask1.Application.DTOs;
 using VentionTask1.Application.Exceptions;
 using VentionTask1.Application.Extensions;
@@ -18,13 +19,15 @@ namespace VentionTask1.Application.Services.Implementation
         private readonly IValidator<UploadFileDTO> _uploadFileValidator;
         private readonly IPublishEndpoint _publishEndpoint;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly ILogger<FileUploadService> _logger;
 
-        public FileUploadService(IFileRepository fileRepository, IValidator<UploadFileDTO> uploadFileValidator, IPublishEndpoint publishEndpoint, IHttpContextAccessor httpContextAccessor)
+        public FileUploadService(IFileRepository fileRepository, IValidator<UploadFileDTO> uploadFileValidator, IPublishEndpoint publishEndpoint, IHttpContextAccessor httpContextAccessor, ILogger<FileUploadService> logger)
         {
             _fileRepository = fileRepository;
             _uploadFileValidator = uploadFileValidator;
             _publishEndpoint = publishEndpoint;
             _httpContextAccessor = httpContextAccessor;
+            _logger = logger;
         }
 
         public async Task<PaginatedResponseDTO<FileDTO>> GetFilesPaginatedAsync(Guid? organizationId, Guid? cursor, int pageSize, CancellationToken ct)
@@ -126,6 +129,8 @@ namespace VentionTask1.Application.Services.Implementation
                 throw new FileStorageException("File was saved, but metadata could not be saved.");
             }
 
+            _logger.LogInformation("File {FileId} uploaded for organization {OrganizationId}", uploadedFile.Id, uploadedFile.OrganizationId);
+
             return uploadedFile.ToDto();
         }
 
@@ -204,6 +209,8 @@ namespace VentionTask1.Application.Services.Implementation
                     }
                 },
                 ct);
+
+            _logger.LogInformation("File processing requested for file {FileId} in organization {OrganizationId}", file.Id, file.OrganizationId);
 
             return file.ToDto();
         }

@@ -1,28 +1,35 @@
 using MassTransit;
+using Microsoft.Extensions.Logging;
 using VentionTask1.Application.Messaging;
 using VentionTask1.Application.Repositories.Interfaces;
 using VentionTask1.Application.Services.Interfaces;
 
 namespace VentionTask1.Application.Consumers
 {
-    public class FileChunkingCompletedConsumer
-        : IConsumer<FileChunkingCompletedEvent>
+    public class FileTextExtractionRequestedConsumer
+        : IConsumer<FileTextExtractionRequestedEvent>
     {
         private readonly IFileRepository _fileRepository;
         private readonly IPublishEndpoint _publishEndpoint;
+        private readonly IFileIngestionService _fileIngestionService;
         private readonly IFileProcessingNotifier _notifier;
+        private readonly ILogger<FileTextExtractionRequestedConsumer> _logger;
 
-        public FileChunkingCompletedConsumer(
+        public FileTextExtractionRequestedConsumer(
             IFileRepository fileRepository,
             IPublishEndpoint publishEndpoint,
-            IFileProcessingNotifier notifier)
+            IFileIngestionService fileIngestionService,
+            IFileProcessingNotifier notifier,
+            ILogger<FileTextExtractionRequestedConsumer> logger)
         {
             _fileRepository = fileRepository;
             _publishEndpoint = publishEndpoint;
+            _fileIngestionService = fileIngestionService;
             _notifier = notifier;
+            _logger = logger;
         }
 
-        public async Task Consume(ConsumeContext<FileChunkingCompletedEvent> context)
+        public async Task Consume(ConsumeContext<FileTextExtractionRequestedEvent> context)
         {
             var message = context.Message;
             var ct = context.CancellationToken;
@@ -41,18 +48,21 @@ namespace VentionTask1.Application.Consumers
 
             try
             {
-                await _notifier.NotifyChunkingStartedAsync(message.FileId, file.OrganizationId, ct);
+                _logger.LogInformation("Text extraction started for file {FileId}", message.FileId);
+
+                await _notifier.NotifyTextExtractionStartedAsync(message.FileId, file.OrganizationId, ct);
+
+                await _fileIngestionService.IngestAsync(message.FileId, ct);
 
                 await _publishEndpoint.Publish(
-                    new FileProcessingCompletedEvent(message.FileId),
+                    new FileChunkingRequestedEvent(message.FileId),
                     ct);
             }
             catch (Exception ex)
             {
-                file.Status = "failed";
-                file.ProcessingError = ex.Message;
+                _logger.LogError(ex, "Text extraction failed for file {FileId}", message.FileId);
 
-                await _fileRepository.SaveChangesAsync(ct);
+                await _fileRepository.MarkFailedAsync(message.FileId, ex.Message, ct);
 
                 await _notifier.NotifyFailedAsync(message.FileId, file.OrganizationId, ex.Message, ct);
 

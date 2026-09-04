@@ -31,13 +31,16 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 
+app.UseRateLimiter();
+
 app.MapGrpcService<UsersGrpcService>();
 
 app.MapControllers();
 
-app.MapGraphQL("/graphql");
+app.MapGraphQL("/graphql").RequireAuthorization();
 
 app.MapHub<FileProcessingHub>("/hubs/file-processing").RequireAuthorization();
 app.MapHub<PresenceHub>("/hubs/presence").RequireAuthorization();
+app.MapHub<ChatHub>("/hubs/chat").RequireAuthorization();
 
 app.Run();

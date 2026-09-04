@@ -23,7 +23,6 @@ namespace VentionTask1.Infrastructure.Repositories.Implementation
             var query = _dbContext.OrganizationMembers
                 .AsNoTracking()
                 .Include(member => member.User)
-                .Include(member => member.Organization)
                 .Where(member => member.OrganizationId == organizationId)
                 .OrderBy(member => member.Id)
                 .AsQueryable();
@@ -57,7 +56,6 @@ namespace VentionTask1.Infrastructure.Repositories.Implementation
         {
             return await _dbContext.OrganizationMembers
                 .Include(member => member.User)
-                .Include(member => member.Organization)
                 .FirstOrDefaultAsync(
                     member =>
                         member.OrganizationId == organizationId &&

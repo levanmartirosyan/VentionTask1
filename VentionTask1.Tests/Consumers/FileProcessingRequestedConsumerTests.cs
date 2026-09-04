@@ -1,4 +1,5 @@
 using MassTransit;
+using Microsoft.Extensions.Logging;
 using Moq;
 using VentionTask1.Application.Consumers;
 using VentionTask1.Application.Messaging;
@@ -13,6 +14,7 @@ namespace VentionTask1.Tests.Consumers
         private readonly Mock<IFileRepository> _fileRepositoryMock;
         private readonly Mock<IPublishEndpoint> _publishEndpointMock;
         private readonly Mock<IFileProcessingNotifier> _notifierMock;
+        private readonly Mock<ILogger<FileProcessingRequestedConsumer>> _loggerMock;
         private readonly FileProcessingRequestedConsumer _consumer;
 
         public FileProcessingRequestedConsumerTests()
@@ -20,11 +22,13 @@ namespace VentionTask1.Tests.Consumers
             _fileRepositoryMock = new Mock<IFileRepository>();
             _publishEndpointMock = new Mock<IPublishEndpoint>();
             _notifierMock = new Mock<IFileProcessingNotifier>();
+            _loggerMock = new Mock<ILogger<FileProcessingRequestedConsumer>>();
 
             _consumer = new FileProcessingRequestedConsumer(
                 _fileRepositoryMock.Object,
                 _publishEndpointMock.Object,
-                _notifierMock.Object);
+                _notifierMock.Object,
+                _loggerMock.Object);
         }
 
         [Fact]
@@ -55,7 +59,7 @@ namespace VentionTask1.Tests.Consumers
             await _consumer.Consume(context);
 
             _publishEndpointMock.Verify(
-                endpoint => endpoint.Publish(It.IsAny<FileTextExtractedEvent>(), CancellationToken.None),
+                endpoint => endpoint.Publish(It.IsAny<FileTextExtractionRequestedEvent>(), CancellationToken.None),
                 Times.Never);
         }
 
@@ -85,7 +89,7 @@ namespace VentionTask1.Tests.Consumers
 
             _publishEndpointMock.Verify(
                 endpoint => endpoint.Publish(
-                    It.Is<FileTextExtractedEvent>(eventMessage => eventMessage.FileId == file.Id),
+                    It.Is<FileTextExtractionRequestedEvent>(eventMessage => eventMessage.FileId == file.Id),
                     CancellationToken.None),
                 Times.Once);
         }
@@ -107,15 +111,17 @@ namespace VentionTask1.Tests.Consumers
                 .ReturnsAsync(true);
 
             _publishEndpointMock
-                .Setup(endpoint => endpoint.Publish(It.IsAny<FileTextExtractedEvent>(), CancellationToken.None))
+                .Setup(endpoint => endpoint.Publish(It.IsAny<FileTextExtractionRequestedEvent>(), CancellationToken.None))
                 .ThrowsAsync(exception);
 
             var thrown = await Assert.ThrowsAsync<InvalidOperationException>(() =>
                 _consumer.Consume(context));
 
             Assert.Equal(exception.Message, thrown.Message);
-            Assert.Equal("failed", file.Status);
-            Assert.Equal(exception.Message, file.ProcessingError);
+
+            _fileRepositoryMock.Verify(
+                repository => repository.MarkFailedAsync(file.Id, exception.Message, CancellationToken.None),
+                Times.Once);
 
             _notifierMock.Verify(
                 notifier => notifier.NotifyFailedAsync(file.Id, file.OrganizationId, exception.Message, CancellationToken.None),

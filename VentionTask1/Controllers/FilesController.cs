@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using VentionTask1.Application.DTOs;
 using VentionTask1.Application.Services.Interfaces;
 using VentionTask1.Domain.Constants;
+using VentionTask1.WebApi.Extensions;
 
 namespace VentionTask1.WebApi.Controllers
 {
@@ -12,15 +13,22 @@ namespace VentionTask1.WebApi.Controllers
     public class FilesController : ControllerBase
     {
         private readonly IFileUploadService _fileService;
+        private readonly IOrganizationPermissionService _permissionService;
 
-        public FilesController(IFileUploadService fileService)
+        public FilesController(IFileUploadService fileService, IOrganizationPermissionService permissionService)
         {
             _fileService = fileService;
+            _permissionService = permissionService;
         }
 
         [HttpGet]
         public async Task<ActionResult<PaginatedResponseDTO<FileDTO>>> GetFilesAsync([FromQuery] Guid? cursor, [FromQuery] int pageSize = 10, [FromHeader(Name = "x-org-id")] Guid? organizationId = null, CancellationToken ct = default)
         {
+            var userId = User.GetUserId();
+            var role = User.GetPlatformRole();
+
+            await _permissionService.EnsureCanViewFilesAsync(userId, role, organizationId, ct);
+
             var files = await _fileService.GetFilesPaginatedAsync(organizationId, cursor, pageSize, ct);
 
             return Ok(files);
@@ -31,6 +39,11 @@ namespace VentionTask1.WebApi.Controllers
         [RequestFormLimits(MultipartBodyLengthLimit = FileUploadConstants.MaxFileSize)]
         public async Task<ActionResult<FileDTO>> Upload(IFormFile file, [FromHeader(Name = "x-org-id")] Guid? organizationId, CancellationToken ct)
         {
+            var userId = User.GetUserId();
+            var role = User.GetPlatformRole();
+
+            await _permissionService.EnsureCanUploadFileAsync(userId, role, organizationId, ct);
+
             var uploadedFile = await _fileService.UploadAsync(
                 new UploadFileDTO
                 {
@@ -45,6 +58,11 @@ namespace VentionTask1.WebApi.Controllers
         [HttpDelete("{id:guid}")]
         public async Task<IActionResult> Delete(Guid id, CancellationToken ct)
         {
+            var userId = User.GetUserId();
+            var role = User.GetPlatformRole();
+
+            await _permissionService.EnsureCanManageFileAsync(userId, role, id, ct);
+
             await _fileService.DeleteAsync(id, ct);
 
             return NoContent();
@@ -53,6 +71,11 @@ namespace VentionTask1.WebApi.Controllers
         [HttpPost("{id:guid}/process")]
         public async Task<ActionResult<FileDTO>> Process(Guid id, CancellationToken ct)
         {
+            var userId = User.GetUserId();
+            var role = User.GetPlatformRole();
+
+            await _permissionService.EnsureCanManageFileAsync(userId, role, id, ct);
+
             var file = await _fileService.MarkProcessingAsync(id, ct);
 
             return Ok(file);

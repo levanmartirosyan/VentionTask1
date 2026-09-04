@@ -11,5 +11,8 @@ namespace VentionTask1.Domain.Entities
         public ICollection<OrganizationMember> OrganizationMemberships { get; set; } = [];
         public ICollection<Session> Sessions { get; set; } = [];
         public ICollection<UploadedFile> Files { get; set; } = [];
+        public ICollection<ChatSession> ParticipantOneChatSessions { get; set; } = [];
+        public ICollection<ChatSession> ParticipantTwoChatSessions { get; set; } = [];
+        public ICollection<ChatMessage> ChatMessages { get; set; } = [];
     }
 }

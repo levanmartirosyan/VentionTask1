@@ -1,4 +1,5 @@
 using MassTransit;
+using Microsoft.Extensions.Logging;
 using Moq;
 using VentionTask1.Application.Consumers;
 using VentionTask1.Application.Messaging;
@@ -14,7 +15,8 @@ namespace VentionTask1.Tests.Consumers
         private readonly Mock<IPublishEndpoint> _publishEndpointMock;
         private readonly Mock<IFileIngestionService> _fileIngestionServiceMock;
         private readonly Mock<IFileProcessingNotifier> _notifierMock;
-        private readonly FileTextExtractedConsumer _consumer;
+        private readonly Mock<ILogger<FileTextExtractionRequestedConsumer>> _loggerMock;
+        private readonly FileTextExtractionRequestedConsumer _consumer;
 
         public FileTextExtractedConsumerTests()
         {
@@ -22,19 +24,21 @@ namespace VentionTask1.Tests.Consumers
             _publishEndpointMock = new Mock<IPublishEndpoint>();
             _fileIngestionServiceMock = new Mock<IFileIngestionService>();
             _notifierMock = new Mock<IFileProcessingNotifier>();
+            _loggerMock = new Mock<ILogger<FileTextExtractionRequestedConsumer>>();
 
-            _consumer = new FileTextExtractedConsumer(
+            _consumer = new FileTextExtractionRequestedConsumer(
                 _fileRepositoryMock.Object,
                 _publishEndpointMock.Object,
                 _fileIngestionServiceMock.Object,
-                _notifierMock.Object);
+                _notifierMock.Object,
+                _loggerMock.Object);
         }
 
         [Fact]
         public async Task Consume_WhenFileExists_ShouldNotifyExtractingIngestAndPublishChunkingCompletedEvent()
         {
             var file = CreateFile("processing");
-            var message = new FileTextExtractedEvent(file.Id);
+            var message = new FileTextExtractionRequestedEvent(file.Id);
             var context = CreateContext(message);
 
             _fileRepositoryMock
@@ -53,7 +57,7 @@ namespace VentionTask1.Tests.Consumers
 
             _publishEndpointMock.Verify(
                 endpoint => endpoint.Publish(
-                    It.Is<FileChunkingCompletedEvent>(eventMessage => eventMessage.FileId == file.Id),
+                    It.Is<FileChunkingRequestedEvent>(eventMessage => eventMessage.FileId == file.Id),
                     CancellationToken.None),
                 Times.Once);
         }
@@ -62,7 +66,7 @@ namespace VentionTask1.Tests.Consumers
         public async Task Consume_WhenIngestionFails_ShouldMarkFailedNotifyAndRethrow()
         {
             var file = CreateFile("processing");
-            var message = new FileTextExtractedEvent(file.Id);
+            var message = new FileTextExtractionRequestedEvent(file.Id);
             var context = CreateContext(message);
             var exception = new NotSupportedException("Unsupported file.");
 
@@ -81,17 +85,18 @@ namespace VentionTask1.Tests.Consumers
             await Assert.ThrowsAsync<NotSupportedException>(() =>
                 _consumer.Consume(context));
 
-            Assert.Equal("failed", file.Status);
-            Assert.Equal(exception.Message, file.ProcessingError);
+            _fileRepositoryMock.Verify(
+                repository => repository.MarkFailedAsync(file.Id, exception.Message, CancellationToken.None),
+                Times.Once);
 
             _notifierMock.Verify(
                 notifier => notifier.NotifyFailedAsync(file.Id, file.OrganizationId, exception.Message, CancellationToken.None),
                 Times.Once);
         }
 
-        private static ConsumeContext<FileTextExtractedEvent> CreateContext(FileTextExtractedEvent message)
+        private static ConsumeContext<FileTextExtractionRequestedEvent> CreateContext(FileTextExtractionRequestedEvent message)
         {
-            var contextMock = new Mock<ConsumeContext<FileTextExtractedEvent>>();
+            var contextMock = new Mock<ConsumeContext<FileTextExtractionRequestedEvent>>();
 
             contextMock
                 .SetupGet(context => context.Message)
